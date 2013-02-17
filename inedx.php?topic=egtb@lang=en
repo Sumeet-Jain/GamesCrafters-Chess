@@ -1,0 +1,131 @@
+<HTML>
+    <HEAD>
+        <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+        <meta NAME="robots" CONTENT="index,follow"> 
+		<meta NAME="language" CONTENT="en"> 
+		<link rel="stylesheet" type="text/css" href="formate.css">
+
+		 <meta NAME="description" CONTENT="Knowledge4IT - Entwurf und Implementierung von Softwarel&ouml;sungen. Schulungen, Seminare und Workshops. Wissenschaftliche Spiele-Ecke.">
+		 <meta NAME="keywords" CONTENT="Programmierung, Implementierung, Spiele, Schach, Schachendspiele">
+		 <meta NAME="copyright" CONTENT="Eiko Bleicher">
+		 <meta name="revisit-after" CONTENT="7 days">		
+		 <title>Knowledge4IT - Entwurf, Implementierung, Weiterbildung.</title>
+    </HEAD>
+ 
+	<BODY>
+        <table border=0 cellpadding=0 cellspacing=0>
+            <tr height="133" >
+                <td width="260" valign="middle" align="center">
+                    <img src="images/logo.jpg" alt="Knowledge4IT" height="132" width="240">
+                </td>
+                <td width="50">&nbsp;</td>
+                <td>
+                    <ul type="square">
+                        <li class="top"><nobr>Design and Implementation of Software</nobr></li>
+                        <li class="top"><nobr>Training, Seminars and Workshops</nobr></li>
+                        <li class="top"><nobr>Use of Modern Technology Standards</nobr></li>
+                        <li class="top"><nobr>Scientific Game Corner</nobr></li>
+					 </ul>
+                </td>
+                <td width="50">&nbsp;</td>
+				<td width="180" valign="bottom">
+					<table>
+						<tr>
+							<td valign="center"><a href="index.php?topic=egtb&lang=de"><img src="images/german.gif" alt="Deutsche Version"></a></td>
+							<td valign="center"><nobr>Diese Seite auf deutsch</nobr></td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+		<hr noshade>
+
+
+	<table cols="3" rows="1" width="100%">
+    <tr height="100%" valign="top">
+        <td width="150" valign="top">
+<table width="100%" cellspacing="0" cellpadding="0">
+<tr valign="middle" height="5"><td class="unsel"></td></tr><tr valign="middle"><td class="unsel"><a href="index.php?topic=willkommen&lang=en"  class="unsel">&nbsp;Welcome</a></td></tr><tr valign="middle" height="5"><td class="unsel"></td></tr>
+<tr valign="middle" height="5"><td class="unsel"></td></tr><tr valign="middle"><td class="unsel"><a href="index.php?topic=dienste&lang=en"  class="unsel">&nbsp;Services</a></td></tr><tr valign="middle" height="5"><td class="unsel"></td></tr>
+<tr valign="middle" height="5"><td class="unsel"></td></tr><tr valign="middle"><td class="unsel"><a href="index.php?topic=schulungen&lang=en"  class="unsel">&nbsp;Courses</a></td></tr><tr valign="middle" height="5"><td class="unsel"></td></tr>
+<tr valign="middle" height="5"><td class="unsel"></td></tr><tr valign="middle"><td class="unsel"><a href="index.php?topic=games&lang=en"  class="unsel">&nbsp;Games Corner</a></td></tr><tr valign="middle" height="5"><td class="unsel"></td></tr>
+<tr valign="middle" height="5"><td class="unsel"></td></tr><tr valign="middle"><td class="sel"><a href="index.php?topic=egtb&lang=en"  class="sel">&nbsp;Nalimov EGTB</a></td></tr><tr valign="middle" height="5"><td class="unsel"></td></tr>
+<tr valign="middle" height="5"><td class="unsel"></td></tr><tr valign="middle"><td class="unsel"><a href="index.php?topic=kontakt&lang=en"  class="unsel">&nbsp;Contact</a></td></tr><tr valign="middle" height="5"><td class="unsel"></td></tr>
+<tr valign="middle" height="5"><td class="unsel"></td></tr><tr valign="middle"><td class="unsel"><a href="index.php?topic=impressum&lang=en"  class="unsel">&nbsp;About us</a></td></tr><tr valign="middle" height="5"><td class="unsel"></td></tr>
+<tr valign="middle" height="70"><td class="unsel">&nbsp; &nbsp;</td></tr>
+</table>
+
+        </td>
+        <td width="10">&nbsp;</td>
+        <td width="*"  valign="top">
+
+
+<h2>Web Query for Nalimov Endgame Tablebases</h2>
+
+<table>
+<tr><td width="600">
+
+Using the applet below all of the currently published Nalimov Tablebases can be queried
+online (incl. 6-men databases). The first query may take some seconds to complete.
+Sorry for any temporary inaccessibility due to system maintenance.<br>
+<br>
+Thanks to Eugene Nalimov, Andrew Kadatch, Robert Hyatt, Kyrill Kryukov, Nelson Hernandez for generating, compressing, and publishing the databases and offering them for free.<br>
+<br>
+<b>Please enter max. 6 pieces (incl. kings).<br>
+<b><i>*** NEW! All 6-men tables online (except 5 vs. 1). ***</i></b><br>
+<!-- <br>
+ You can check wich databases are available: <a href="javascript:showlist();">Click me.</a></b> -->
+ <br>
+ <iframe src="http://www.k4it.de/egtb/endgame.php?lang=en" frameborder="0" width="594" scrolling="no" height="485">X</iframe> 
+
+</td>
+
+<td width="10"></td>
+<td width="240">
+	<a href="http://www.freezerchess.com" target="_blank"><img src="images/bannerFreezer.gif" width="238" height="110" alt="Read about Freezer"></a>
+	<br><br>
+	Please visit <a href="http://www.shredderchess.com">shredderchess.com</a> and play Shredder&nbsp;10, solve daily chess puzzles or have a look into the large online opening book.<br>
+	
+	<br>
+	<br>
+	<a href="http://www.chesstutor.eu" target="_blank"><img src="images/bannerTutor.jpg" width="189" height="100" alt="Learn about Chess Tutor"></a>
+	<br><br>
+	Please visit <a href="http://www.chesstutor.eu">chesstutor.eu</a> and learn about the great Chess Tutor.<br>
+
+</td>
+
+</tr>
+	</table>
+
+
+
+
+<br>
+<b>Hint:</b> You can copy the FEN string by selecting and copying it. In most <br>
+browsers you can select the FEN string by triple-clicking on it.
+<br><br>
+<b>NEW:</b> Many features are also available via keyboard shortcuts:
+ Flip board&nbsp;[f],
+ Input FEN&nbsp;[i],<br>
+ Back&nbsp;[t],
+ King(s)&nbsp;[1],
+ Queen(s)&nbsp;[2] etc.,
+ Move piece / Free&nbsp;[7],
+ Change color&nbsp;[c],<br>
+ Play best move&nbsp;[b],
+ Move position&nbsp;[arrow keys].
+<br><br>
+
+
+
+    </tr>
+    </table>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-6838112-3";
+urchinTracker();
+</script>    </BODY>
+</HTML>
+
+
