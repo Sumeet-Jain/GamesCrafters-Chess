@@ -76,7 +76,7 @@ Thanks to Eugene Nalimov, Andrew Kadatch, Robert Hyatt, Kyrill Kryukov, Nelson H
 <!-- <br>
  You can check wich databases are available: <a href="javascript:showlist();">Click me.</a></b> -->
  <br>
- <iframe src="http://www.k4it.de/egtb/endgame.php?lang=en" frameborder="0" width="594" scrolling="no" height="485">X</iframe> 
+ <iframe src="endgame.php%3Flang=en" frameborder="0" width="594" scrolling="no" height="485">X</iframe> 
 
 </td>
 

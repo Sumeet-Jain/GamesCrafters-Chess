@@ -2,7 +2,7 @@
 
 <head>
 
-			<script language="JavaScript" src="jscript.php?app=endgame&lang=en"></script>
+			<script language="JavaScript" src="jscript.php%3Fapp=endgame"></script>
 	
 	<style type="text/css">
 
@@ -84,6 +84,7 @@ enmouse(false);
 <div id="info" class="info" onmouseover="enmouse(true);" onmouseout="enmouse(false);" style="position:absolute; left:30; top:362;" ></input></div>
 
 
+<!-- CREATING THE BUTTONS-->
 <div class="button" style="position:absolute; left:400; top:389;" onmouseover="over(this);" onmouseout="leave(this);" onclick="flip();" >Flip Board</div>
 
 <div class="button" style="position:absolute; left:400; top:416;" onmouseover="over(this);" onmouseout="leave(this);" onclick="inputfen();" >Input FEN</div>
