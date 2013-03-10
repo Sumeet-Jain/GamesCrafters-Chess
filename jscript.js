@@ -27,7 +27,7 @@ function RequestObject(ownerid) {
 	this.ownerid = ownerid;
 	this.skipallbutlast = true;
 	this.http = createRequestObject();
-	this.script = 'http://www.k4it.de/egtb/fetch.php';
+	this.script = 'test.php';
 	this.responsehandlername = "responseHandler"+reqcount;
 	reqcollection[reqcount] = this;
 	reqcount++;	
@@ -58,23 +58,23 @@ function RequestObject_HandleResponse() {
         var obid = null;
         var value = null;
         var data = response.split('|');
-				for (var i = 0; i < data.length; i++) {
-					if (data[i] == "hook") {
-						hook = data[i+1];
-						i++;
-					}
-					else if (data[i] == "reqid") {
-						reqid = data[i+1];
-						i++;
-					}
-					else if (data[i] == "value") {
-						value = data[i+1];
-						i++;
-					}
-					else if (data[i] == "obid") {
-						obid = data[i+1];
-						i++;
-					}
+        for (var i = 0; i < data.length; i++) {
+            if (data[i] == "hook") {
+                    hook = data[i+1];
+                    i++;
+                }
+                else if (data[i] == "reqid") {
+                    reqid = data[i+1];
+                    i++;
+                }
+                else if (data[i] == "value") {
+                    value = data[i+1];
+                    i++;
+                }
+                else if (data[i] == "obid") {
+                    obid = data[i+1];
+                    i++;
+                }
         }      
       if (obid != null) {
       	var theob = Objectmap.Get(obid);
@@ -92,13 +92,13 @@ RequestObject.prototype.HandleResponse = RequestObject_HandleResponse;
 
 
 function RequestObject_SendRequest(hook,action) {
-	var reqid = 'req'+Math.random();
-	var u = this.script+'?obid='+this.ownerid+'&reqid='+reqid+'&hook='+hook+'&action='+action;
+	//var reqid = 'req'+Math.random();
+	//var u = this.script+'?obid='+this.ownerid+'&reqid='+reqid+'&hook='+hook+'&action='+action;
+    var u = this.script;
 	if (this.queue.length == 0) {
 		try {
-        this.queue.push(u);
-        this.http.open("GET", u, true);
-        this.http.withCredentials = "true";
+			this.queue.push(u);
+	    this.http.open("GET", u, true);
 	    this.http.onreadystatechange = eval(this.responsehandlername);
 	    this.http.send(null);
   	} catch (x) {alert(x);}
@@ -106,7 +106,7 @@ function RequestObject_SendRequest(hook,action) {
 	else {
 		this.queue.push(u);
 	}
-  return reqid;
+  return 1;
 }
 
 RequestObject.prototype.SendRequest = RequestObject_SendRequest;
@@ -129,8 +129,8 @@ function Objectmap() {}
 Objectmap.objectcount = 0;
 Objectmap.objectmap = new Array();
 
-function Objectmap_Add(baseid,ob) {
-	var theid = baseid + '' + Objectmap.objectcount + Math.random();
+function Objectmap_Add(baseid,ob,boo) {
+	var theid = baseid + '' + Objectmap.objectcount; 
 	Objectmap.objectmap[theid] = ob;
 	Objectmap.objectcount++;
 	return theid;
@@ -1081,7 +1081,7 @@ EndgameTable.prototype.ShowNoInfoAvailable = EndgameTable_ShowNoInfoAvailable;
 
 function EndgameTable_ParseRequestResult(req,text) {
 	var lastreqtok = this.lastreqid.split(':');
-	if (lastreqtok[0] != req) return;
+	//if (lastreqtok[0] != req) return;
 	this.cacheresults[0] = text;
 	this.cache.Put(lastreqtok[1],text);
 	var moves = new Array();
