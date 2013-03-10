@@ -131,6 +131,7 @@ Objectmap.objectmap = new Array();
 
 function Objectmap_Add(baseid,ob,boo) {
 	var theid = baseid + '' + Objectmap.objectcount; 
+   // theid = theid + Math.random();
 	Objectmap.objectmap[theid] = ob;
 	Objectmap.objectcount++;
 	return theid;
