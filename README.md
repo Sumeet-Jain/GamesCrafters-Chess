@@ -4,7 +4,6 @@ Original interace from k4it.de
 Most of the code from k4it.de
 All images from k4it.de
 
-Change Log:
-  Changed src files to reference files in this directory and not k4it's. 
+
   
   
