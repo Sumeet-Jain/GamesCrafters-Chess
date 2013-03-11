@@ -27,7 +27,7 @@ function RequestObject(ownerid) {
 	this.ownerid = ownerid;
 	this.skipallbutlast = true;
 	this.http = createRequestObject();
-	this.script = 'test.php';
+	this.script = 'test.txtxtt';
 	this.responsehandlername = "responseHandler"+reqcount;
 	reqcollection[reqcount] = this;
 	reqcount++;	
@@ -131,7 +131,7 @@ Objectmap.objectmap = new Array();
 
 function Objectmap_Add(baseid,ob,boo) {
 	var theid = baseid + '' + Objectmap.objectcount; 
-   // theid = theid + Math.random();
+    //theid = theid + Math.random();
 	Objectmap.objectmap[theid] = ob;
 	Objectmap.objectcount++;
 	return theid;
@@ -724,14 +724,14 @@ function Board_Mouseup(ev, ob) {
 		if (o.liftedpiece > 6)promo += 6;
 	}
 
-		if (s == 'dr') {
-			var x = ev.clientX - document.getElementById(o.boardid).offsetLeft+scrollOffsetX();
-			var y = ev.clientY - document.getElementById(o.boardid).offsetTop+scrollOffsetY();
-			s = o.GetClicksquare(x,y);
-		}
-		s = eval(s);
+    if (s == 'dr') {
+        var x = ev.clientX - document.getElementById(o.boardid).offsetLeft+scrollOffsetX();
+        var y = ev.clientY - document.getElementById(o.boardid).offsetTop+scrollOffsetY();
+        s = o.GetClicksquare(x,y);
+    }
+    s = eval(s);
 
-  o.HidePromos();
+    o.HidePromos();
  	
  	if (o.allowfreemoving==_t) {
 		if (o.liftedfrom != s) {
@@ -806,21 +806,30 @@ function Board_SetVisible(b) {
 Board.prototype.SetVisible = Board_SetVisible;
 
 
-function Board_MarkSquare(sq) {
-	var f = sq & 7;
-	var r = sq >> 3;
-	var col = ((r % 2) == (f % 2)) ? "rgb(146,174,221)" : "rgb(198,221,255)";
-	document.getElementById(this.boardid+"_"+sq).style.background = col;
+function Board_MarkSquare(sq, winLoseDraw, coloring) {
+    if(!coloring){
+        var f = sq & 7;
+        var r = sq >> 3;
+        var col = ((r % 2) == (f % 2)) ? "rgb(146,174,221)" : "rgb(198,221,255)";
+        document.getElementById(this.boardid+"_"+sq).style.background = col;
+    } else {
+        this.ColorSquare(sq, winLoseDraw);
+    }
+        
 	this.hasmarked = _t;
 }
 
 Board.prototype.MarkSquare = Board_MarkSquare;
 
-function Board_UnmarkSquare(sq) {
-	var f = sq & 7;
-	var r = sq >> 3;
-	var col = ((r % 2) == (f % 2)) ? this.darkcolor : this.lightcolor;
-	document.getElementById(this.boardid+"_"+sq).style.background = col;
+function Board_UnmarkSquare(sq, winLoseDraw, coloring) {
+    if(!coloring){
+        var f = sq & 7;
+        var r = sq >> 3;
+        var col = ((r % 2) == (f % 2)) ? this.darkcolor : this.lightcolor;
+        document.getElementById(this.boardid+"_"+sq).style.background = col;
+    } else {
+        this.ColorSquare(sq, winLoseDraw);
+    }
 }
 
 Board.prototype.UnmarkSquare = Board_UnmarkSquare;
@@ -940,6 +949,11 @@ function EndgameTable(posx, posy, tabheight, lang, position) {
 	var d = this.GetDivElement();
 	document.getElementsByTagName("body")[0].appendChild(d);
 	this.SetHeaderTable(lang);
+
+    //VVH Variables
+    this.coloring = true; 
+    this.winLose = new Array(); //Stores the win lose draw value for each row in the endgame table.
+    this.sqVVH = new Array(64); //Stores the highest value for a certain square. Highest Value is considered Win in least --> Draw --> Lose;
 }
 
 function EndgameTable_GetDivElement() {
@@ -995,9 +1009,16 @@ function EndgameTable_SetData(moves) {
 		this.ShowNoInfoAvailable();
 		return;
 	}
+
+    if(this.coloring){
+        this.sqVVH = new Array(64);
+    }
+        
 		
 	var txt = '<table border="0" cellpadding="0" cellspacing="0">';
 	for (var k = 0; k < moves.length; k++) {
+        
+
 		var lengths = new Array(60,100);
 		var thestyle = 'style="font-family:Verdana,Geneva,Arial,Helvetica,sans-serif; font-size:11px;font-weight:100;"';
 		txt += '<tr id="'+this.tableid+'_'+k+'" onmousedown="javascript:EndgameTable.Endingdown(event,this);" onmouseover="javascript:EndgameTable.Endingover(event,this);" onmouseout="javascript:EndgameTable.Endingout(event,this);" >';		
@@ -1005,9 +1026,17 @@ function EndgameTable_SetData(moves) {
 		var toks = moves[k][0].split('-');
 		
 		var p = this.position.b[toks[0]];
-		var f = eval(toks[0]);
-		var t = eval(toks[1]);
-		var pi = this.position.piececodes[p];
+		var f = eval(toks[0]);//from square
+		var t = eval(toks[1]);//to square
+		var pi = this.position.piececodes[p];//which piece
+        var winLoseDraw = moves[k][1].split(" ")[1];
+
+        if(this.coloring){
+            if(this.sqVVH[f] == undefined){
+                this.observer.ColorSquare(f, winLoseDraw);
+                this.sqVVH[f] = winLoseDraw;
+            }
+        }
 		
 		var isep = (p == 6 || p == 12) && ((f&7) != (t&7)) && (this.position.b[t] == 0); 
 		var iscapture = (this.position.b[t] != 0) || isep;
@@ -1089,6 +1118,7 @@ function EndgameTable_ParseRequestResult(req,text) {
 	this.movefrom = new Array();
 	this.moveto = new Array();
 	this.movepromo = new Array();
+    this.winLose = new Array();
 	var num = 0;
 	this.posval = new Array('','');
 	if (text) {
@@ -1127,6 +1157,8 @@ function EndgameTable_ParseRequestResult(req,text) {
 
 	
 			this.movefrom[num] = eval(m[0]);	this.moveto[num] = eval(m[1]);	this.movepromo[num] = m.length == 3 ? eval(m[2]) : 0;
+            this.winLose[num] = curr[1].split(" ")[1];
+
 			if (this.movepromo[num] != 0 && this.moveto[num] >= 56 && this.movepromo[num] > 6) this.movepromo[num]-=6;
 			moves[num] = curr; num++;
 		}
@@ -1141,9 +1173,9 @@ function EndgameTable_Endingover(ev, ob) {
 	ob.style.background = '#A0B9E5';
 	var tab = Objectmap.Get(ob.id.split('_')[0]);
 	if (tab.observer != null) {	
-		var row = ob.id.split('_')[1];
-		tab.observer.MarkSquare(tab.movefrom[row]); 
-		tab.observer.MarkSquare(tab.moveto[row]);
+        var row = ob.id.split('_')[1];
+        tab.observer.MarkSquare(tab.movefrom[row], tab.winLose[row], tab.coloring); 
+        tab.observer.MarkSquare(tab.moveto[row],  tab.winLose[row], tab.coloring);
 	}
 }
 
@@ -1154,7 +1186,7 @@ function EndgameTable_Endingout(ev, ob) {
 	var tab = Objectmap.Get(ob.id.split('_')[0]);
 	if (tab.observer != null) {	
 		var row = ob.id.split('_')[1];
-		tab.observer.UnmarkSquare(tab.movefrom[row]);
+		tab.observer.UnmarkSquare(tab.movefrom[row], tab.sqVVH[tab.movefrom[row]], tab.coloring);
 		tab.observer.UnmarkSquare(tab.moveto[row]);
 	}
 }
@@ -1371,6 +1403,7 @@ function SetupTable_UnmarkSquare(sq) {
 			sq = 'move'; col = this.darkcolor;
 	 	}
 		document.getElementById(this.tableid+"_"+sq).style.background = col;
+
 }
 
 SetupTable.prototype.UnmarkSquare = SetupTable_UnmarkSquare;
@@ -1728,15 +1761,43 @@ function EndgameManager_StateChanged(o) {
 
 EndgameManager.prototype.StateChanged = EndgameManager_StateChanged;
 
-	function takeback() {
-		if (em.history.length > 0) {
-			m = em.history.pop();
-			if (em.history.length > 0) {
-				m = em.history.pop();
-			}
-			p.SetFEN(m);
-		}
-	}
+function takeback() {
+    if (em.history.length > 0) {
+        m = em.history.pop();
+        if (em.history.length > 0) {
+            m = em.history.pop();
+        }
+        p.SetFEN(m);
+    }
+}
+
+//Colors 
+function Board_ColorSquare(sq, winTxt){
+    document.getElementById(this.boardid+"_"+sq).style.background = getColor(winTxt);
+}
+
+Board.prototype.ColorSquare = Board_ColorSquare;
+
+//Color constants
+var RED = 'rgb(255,0,0)';
+var YELLOW = 'rgb(255,255,0)';
+var GREEN = 'rgb(0,255,0)';
+
+//Takes in a String whose value should either be Win, Draw, or Lose
+//Returns the RED, YELLOW, GREEN constants
+function getColor(winLoseDraw){
+    if(winLoseDraw == "Win"){
+        return GREEN;
+    } else if(winLoseDraw == "Draw"){
+        return YELLOW;
+    } else {
+        return RED;
+    }
+}
+
+    
+
+
 
 
 
