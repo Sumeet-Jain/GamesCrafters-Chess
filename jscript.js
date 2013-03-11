@@ -27,7 +27,8 @@ function RequestObject(ownerid) {
 	this.ownerid = ownerid;
 	this.skipallbutlast = true;
 	this.http = createRequestObject();
-	this.script = 'test.txtxtt';
+	//this.script = 'http://k4it.de/egtb/fetchegtbGC.php';
+    this.script = "test.txt";
 	this.responsehandlername = "responseHandler"+reqcount;
 	reqcollection[reqcount] = this;
 	reqcount++;	
@@ -92,21 +93,21 @@ RequestObject.prototype.HandleResponse = RequestObject_HandleResponse;
 
 
 function RequestObject_SendRequest(hook,action) {
-	//var reqid = 'req'+Math.random();
+	var reqid = 'req'+Math.random();
 	//var u = this.script+'?obid='+this.ownerid+'&reqid='+reqid+'&hook='+hook+'&action='+action;
-    var u = this.script;
+    var u =this.script;
 	if (this.queue.length == 0) {
 		try {
 			this.queue.push(u);
-	    this.http.open("GET", u, true);
-	    this.http.onreadystatechange = eval(this.responsehandlername);
-	    this.http.send(null);
-  	} catch (x) {alert(x);}
-  }
+            this.http.open("GET", u, true);
+            this.http.onreadystatechange = eval(this.responsehandlername);
+            this.http.send(null);
+        } catch (x) {alert(x);}
+      }
 	else {
 		this.queue.push(u);
 	}
-  return 1;
+  return reqid;
 }
 
 RequestObject.prototype.SendRequest = RequestObject_SendRequest;
@@ -951,7 +952,7 @@ function EndgameTable(posx, posy, tabheight, lang, position) {
 	this.SetHeaderTable(lang);
 
     //VVH Variables
-    this.coloring = true; 
+    this.coloring = true;
     this.winLose = new Array(); //Stores the win lose draw value for each row in the endgame table.
     this.sqVVH = new Array(64); //Stores the highest value for a certain square. Highest Value is considered Win in least --> Draw --> Lose;
 }
@@ -1174,7 +1175,7 @@ function EndgameTable_Endingover(ev, ob) {
 	var tab = Objectmap.Get(ob.id.split('_')[0]);
 	if (tab.observer != null) {	
         var row = ob.id.split('_')[1];
-        tab.observer.MarkSquare(tab.movefrom[row], tab.winLose[row], tab.coloring); 
+        tab.observer.MarkSquare(tab.movefrom[row]); 
         tab.observer.MarkSquare(tab.moveto[row],  tab.winLose[row], tab.coloring);
 	}
 }
