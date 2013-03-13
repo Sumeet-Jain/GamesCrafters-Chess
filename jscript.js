@@ -807,29 +807,29 @@ function Board_SetVisible(b) {
 Board.prototype.SetVisible = Board_SetVisible;
 
 
-function Board_MarkSquare(sq, winLoseDraw, coloring) {
+function Board_MarkSquare(sq, winTxt, coloring, minWin, maxLose) {
     if(!coloring){
         var f = sq & 7;
         var r = sq >> 3;
         var col = ((r % 2) == (f % 2)) ? "rgb(146,174,221)" : "rgb(198,221,255)";
         document.getElementById(this.boardid+"_"+sq).style.background = col;
     } else {
-        this.ColorSquare(sq, winLoseDraw);
+        this.ColorSquare(sq, winTxt, minWin, maxLose);
     }
-        
+
 	this.hasmarked = _t;
 }
 
 Board.prototype.MarkSquare = Board_MarkSquare;
 
-function Board_UnmarkSquare(sq, winLoseDraw, coloring) {
+function Board_UnmarkSquare(sq, winTxt, coloring, minWin, maxLose) {
     if(!coloring){
         var f = sq & 7;
         var r = sq >> 3;
         var col = ((r % 2) == (f % 2)) ? this.darkcolor : this.lightcolor;
         document.getElementById(this.boardid+"_"+sq).style.background = col;
     } else {
-        this.ColorSquare(sq, winLoseDraw);
+        this.ColorSquare(sq, winTxt, minWin, maxLose);
     }
 }
 
@@ -955,6 +955,8 @@ function EndgameTable(posx, posy, tabheight, lang, position) {
     this.coloring = true;
     this.winLose = new Array(); //Stores the win lose draw value for each row in the endgame table.
     this.sqVVH = new Array(64); //Stores the highest value for a certain square. Highest Value is considered Win in least --> Draw --> Lose;
+    this.minWin = 0;
+    this.maxLose = 0;
 }
 
 function EndgameTable_GetDivElement() {
@@ -1014,9 +1016,10 @@ function EndgameTable_SetData(moves) {
     if(this.coloring){
         this.sqVVH = new Array(64);
     }
-        
 		
 	var txt = '<table border="0" cellpadding="0" cellspacing="0">';
+    var setLoseMax = false;
+    var setWinMin = false;
 	for (var k = 0; k < moves.length; k++) {
         
 
@@ -1030,12 +1033,25 @@ function EndgameTable_SetData(moves) {
 		var f = eval(toks[0]);//from square
 		var t = eval(toks[1]);//to square
 		var pi = this.position.piececodes[p];//which piece
-        var winLoseDraw = moves[k][1].split(" ")[1];
+
+        var winTxt = moves[k][1].split(" ");
+
 
         if(this.coloring){
             if(this.sqVVH[f] == undefined){
-                this.observer.ColorSquare(f, winLoseDraw);
-                this.sqVVH[f] = winLoseDraw;
+
+                if(winTxt[POSRESULT] === "Win" && !setWinMin) {
+                    setWinMin = true;
+                    this.minWin = winTxt[INMOVES];
+                }
+
+                if(winTxt[POSRESULT] === "Lose" && !setLoseMax){
+                    setLoseMax = true;
+                    this.maxLose = winTxt[INMOVES];
+                }
+                
+                this.observer.ColorSquare(f, winTxt, this.minWin, this.loseMax);
+                this.sqVVH[f] = winTxt;
             }
         }
 		
@@ -1158,7 +1174,12 @@ function EndgameTable_ParseRequestResult(req,text) {
 
 	
 			this.movefrom[num] = eval(m[0]);	this.moveto[num] = eval(m[1]);	this.movepromo[num] = m.length == 3 ? eval(m[2]) : 0;
-            this.winLose[num] = curr[1].split(" ")[1];
+
+            //Added
+            this.winLose[num] = curr[1].split(" ");
+            
+            //End of Added code
+
 
 			if (this.movepromo[num] != 0 && this.moveto[num] >= 56 && this.movepromo[num] > 6) this.movepromo[num]-=6;
 			moves[num] = curr; num++;
@@ -1176,7 +1197,7 @@ function EndgameTable_Endingover(ev, ob) {
 	if (tab.observer != null) {	
         var row = ob.id.split('_')[1];
         tab.observer.MarkSquare(tab.movefrom[row]); 
-        tab.observer.MarkSquare(tab.moveto[row],  tab.winLose[row], tab.coloring);
+        tab.observer.MarkSquare(tab.moveto[row], tab.winLose[row], tab.coloring, tab.minWin, tab.maxLose);
 	}
 }
 
@@ -1187,7 +1208,7 @@ function EndgameTable_Endingout(ev, ob) {
 	var tab = Objectmap.Get(ob.id.split('_')[0]);
 	if (tab.observer != null) {	
 		var row = ob.id.split('_')[1];
-		tab.observer.UnmarkSquare(tab.movefrom[row], tab.sqVVH[tab.movefrom[row]], tab.coloring);
+		tab.observer.UnmarkSquare(tab.movefrom[row], tab.sqVVH[tab.movefrom[row]], tab.coloring, tab.minWin, tab.maxLose);
 		tab.observer.UnmarkSquare(tab.moveto[row]);
 	}
 }
@@ -1773,28 +1794,62 @@ function takeback() {
 }
 
 //Colors 
-function Board_ColorSquare(sq, winTxt){
-    document.getElementById(this.boardid+"_"+sq).style.background = getColor(winTxt);
+function Board_ColorSquare(sq,winTxt, minWin, maxLose){
+    document.getElementById(this.boardid+"_"+sq).style.background = getColor(winTxt,minWin,maxLose);
 }
 
 Board.prototype.ColorSquare = Board_ColorSquare;
 
 //Color constants
-var RED = 'rgb(255,0,0)';
+var RED = 'rgba(139,0,0,';//Red 4
 var YELLOW = 'rgb(255,255,0)';
-var GREEN = 'rgb(0,255,0)';
+var GREEN = 'rgba(0,127,0,';
+var INMOVES = 3;
+var POSRESULT = 1;
 
 //Takes in a String whose value should either be Win, Draw, or Lose
 //Returns the RED, YELLOW, GREEN constants
-function getColor(winLoseDraw){
+function getColor(winTxt, minWin, maxLose){
+    var txt = "";
+    var winLoseDraw = winTxt[POSRESULT];
+
     if(winLoseDraw == "Win"){
-        return GREEN;
-    } else if(winLoseDraw == "Draw"){
+        txt = GREEN;
+        for(var i = 1; i < 4; i++){
+            if(winTxt[INMOVES] <= i*minWin){
+                return txt + getOpacity(i)+")";
+            }
+        }
+        return txt + getOpacity(4)+ ")";
+    } 
+    else if(winLoseDraw == "Draw"){
         return YELLOW;
-    } else {
-        return RED;
+    }
+    else {
+        txt = RED;
+        for(var i = 1; i < 4; i++){
+            if(winTxt[INMOVES] >= maxLose - maxLose*i/4){
+                return txt + getOpacity(i) + ")";
+            }
+        }
+        return txt + getOpacity(4) + ")";
     }
 }
+
+//Helper function for get color. Get color returns the opacity class, which
+//is a number from one to four. 
+function getOpacity(num){
+    if(num == 1){
+        return "1";
+    }else if (num == 2){
+        return ".5";
+    } else if (num == 3){
+        return ".25";
+    } else {
+        return ".1";
+    }
+}
+    
 
     
 
