@@ -27,7 +27,7 @@ function RequestObject(ownerid) {
 	this.ownerid = ownerid;
 	this.skipallbutlast = true;
 	this.http = createRequestObject();
-	//this.script = 'http://k4it.de/egtb/fetchegtbGC.php';
+//	this.script = 'http://corsproxy.com/k4it.de/egtb/fetch.php';
     this.script = "test.txt";
 	this.responsehandlername = "responseHandler"+reqcount;
 	reqcollection[reqcount] = this;
@@ -94,7 +94,7 @@ RequestObject.prototype.HandleResponse = RequestObject_HandleResponse;
 
 function RequestObject_SendRequest(hook,action) {
 	var reqid = 'req'+Math.random();
-	//var u = this.script+'?obid='+this.ownerid+'&reqid='+reqid+'&hook='+hook+'&action='+action;
+//	var u = this.script+'?obid='+this.ownerid+'&reqid='+reqid+'&hook='+hook+'&action='+action;
     var u =this.script;
 	if (this.queue.length == 0) {
 		try {
@@ -1018,8 +1018,8 @@ function EndgameTable_SetData(moves) {
     }
 		
 	var txt = '<table border="0" cellpadding="0" cellspacing="0">';
-    var setLoseMax = false;
-    var setWinMin = false;
+    var setMaxLose = false;
+    var setMinWin = false;
 	for (var k = 0; k < moves.length; k++) {
         
 
@@ -1038,19 +1038,20 @@ function EndgameTable_SetData(moves) {
 
 
         if(this.coloring){
+
+            if(winTxt[POSRESULT] === "Win" && setMinWin === false) {
+                setMinWin = true;
+                this.minWin = winTxt[INMOVES];
+            }
+
+            if(winTxt[POSRESULT] === "Lose" && setMaxLose === false){
+                setMaxLose = true;
+                this.maxLose = winTxt[INMOVES];
+            }
+            
             if(this.sqVVH[f] == undefined){
-
-                if(winTxt[POSRESULT] === "Win" && !setWinMin) {
-                    setWinMin = true;
-                    this.minWin = winTxt[INMOVES];
-                }
-
-                if(winTxt[POSRESULT] === "Lose" && !setLoseMax){
-                    setLoseMax = true;
-                    this.maxLose = winTxt[INMOVES];
-                }
-                
-                this.observer.ColorSquare(f, winTxt, this.minWin, this.loseMax);
+                this.observer.ColorSquare(f, winTxt, this.minWin, 
+                        this.maxLose);
                 this.sqVVH[f] = winTxt;
             }
         }
@@ -1196,8 +1197,16 @@ function EndgameTable_Endingover(ev, ob) {
 	var tab = Objectmap.Get(ob.id.split('_')[0]);
 	if (tab.observer != null) {	
         var row = ob.id.split('_')[1];
-        tab.observer.MarkSquare(tab.movefrom[row]); 
-        tab.observer.MarkSquare(tab.moveto[row], tab.winLose[row], tab.coloring, tab.minWin, tab.maxLose);
+        var board = tab.observer;
+        board.MarkSquare(tab.movefrom[row]); 
+        board.MarkSquare(tab.moveto[row], tab.winLose[row], tab.coloring, tab.minWin, tab.maxLose);
+        if(tab.coloring){
+            for(var i = 0; i < tab.sqVVH.length; i++){
+                if(tab.sqVVH[i] != undefined && i != tab.movefrom[row]){
+                    board.UnmarkSquare(i);
+                }
+            }
+        }
 	}
 }
 
@@ -1210,6 +1219,15 @@ function EndgameTable_Endingout(ev, ob) {
 		var row = ob.id.split('_')[1];
 		tab.observer.UnmarkSquare(tab.movefrom[row], tab.sqVVH[tab.movefrom[row]], tab.coloring, tab.minWin, tab.maxLose);
 		tab.observer.UnmarkSquare(tab.moveto[row]);
+        //Recolor all other squares
+        if(tab.coloring){
+            for(var i = 0; i < tab.sqVVH.length; i++){
+                if(tab.sqVVH[i] != undefined){
+                    tab.observer.MarkSquare(i, tab.sqVVH[i], tab.coloring, tab.minWin, tab.maxLose);
+                }
+            }
+        }
+
 	}
 }
 
@@ -1804,66 +1822,59 @@ Board.prototype.ColorSquare = Board_ColorSquare;
 var RED = 'rgba(139,0,0,';//Red 4
 var YELLOW = 'rgb(255,255,0)';
 var GREEN = 'rgba(0,127,0,';
+var RGB = 'rgb(';
 var INMOVES = 3;
 var POSRESULT = 1;
 
 //Takes in a String whose value should either be Win, Draw, or Lose
 //Returns the RED, YELLOW, GREEN constants
 function getColor(winTxt, minWin, maxLose){
-    var txt = "";
     var winLoseDraw = winTxt[POSRESULT];
-
     if(winLoseDraw == "Win"){
-        txt = GREEN;
         for(var i = 1; i < 4; i++){
             if(winTxt[INMOVES] <= i*minWin){
-                return txt + getOpacity(i)+")";
+                return getOpacity(i, "Win");
             }
         }
-        return txt + getOpacity(4)+ ")";
+        return getOpacity(4);
     } 
     else if(winLoseDraw == "Draw"){
         return YELLOW;
     }
     else {
-        txt = RED;
         for(var i = 1; i < 4; i++){
             if(winTxt[INMOVES] >= maxLose - maxLose*i/4){
-                return txt + getOpacity(i) + ")";
+                return getOpacity(i, "Lose");
             }
         }
-        return txt + getOpacity(4) + ")";
+        return getOpacity(4, "Lose");
     }
 }
 
 //Helper function for get color. Get color returns the opacity class, which
 //is a number from one to four. 
-function getOpacity(num){
-    if(num == 1){
-        return "1";
-    }else if (num == 2){
-        return ".5";
-    } else if (num == 3){
-        return ".25";
+function getOpacity(num, winLose){
+    if(winLose == "Win"){
+        if(num == 1){
+            return RGB + "0,127,0)";
+        }else if (num == 2){
+            return RGB + "63,127,63)"; 
+        } else if (num == 3){
+            return RGB + "95,127,95)";
+        } else {
+            return RGB + "114,127,114)";
+        }
     } else {
-        return ".1";
+        if(num == 1){
+            return RGB + "139,0,0)";
+        } else if (num == 2){
+            return RGB + '133,63,63)';
+        } else if (num == 3) {
+            return RGB +  '130,95,95)';
+        } else {
+            return RGB + '128,114,114)';
+        }
     }
 }
-    
 
     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
