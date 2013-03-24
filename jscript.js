@@ -27,8 +27,7 @@ function RequestObject(ownerid) {
 	this.ownerid = ownerid;
 	this.skipallbutlast = true;
 	this.http = createRequestObject();
-//	this.script = 'http://corsproxy.com/k4it.de/egtb/fetch.php';
-    this.script = "test.txt";
+    this.script = "getServerResponse.php"
 	this.responsehandlername = "responseHandler"+reqcount;
 	reqcollection[reqcount] = this;
 	reqcount++;	
@@ -94,8 +93,7 @@ RequestObject.prototype.HandleResponse = RequestObject_HandleResponse;
 
 function RequestObject_SendRequest(hook,action) {
 	var reqid = 'req'+Math.random();
-//	var u = this.script+'?obid='+this.ownerid+'&reqid='+reqid+'&hook='+hook+'&action='+action;
-    var u =this.script;
+	var u = this.script+'?obid='+this.ownerid+'&reqid='+reqid+'&hook='+hook+'&action='+action;
 	if (this.queue.length == 0) {
 		try {
 			this.queue.push(u);
@@ -132,7 +130,7 @@ Objectmap.objectmap = new Array();
 
 function Objectmap_Add(baseid,ob,boo) {
 	var theid = baseid + '' + Objectmap.objectcount; 
-    //theid = theid + Math.random();
+    theid = theid + Math.random();
 	Objectmap.objectmap[theid] = ob;
 	Objectmap.objectcount++;
 	return theid;
@@ -1129,7 +1127,7 @@ EndgameTable.prototype.ShowNoInfoAvailable = EndgameTable_ShowNoInfoAvailable;
 
 function EndgameTable_ParseRequestResult(req,text) {
 	var lastreqtok = this.lastreqid.split(':');
-	//if (lastreqtok[0] != req) return;
+	if (lastreqtok[0] != req) return;
 	this.cacheresults[0] = text;
 	this.cache.Put(lastreqtok[1],text);
 	var moves = new Array();
@@ -1198,8 +1196,12 @@ function EndgameTable_Endingover(ev, ob) {
 	if (tab.observer != null) {	
         var row = ob.id.split('_')[1];
         var board = tab.observer;
-        board.MarkSquare(tab.movefrom[row]); 
-        board.MarkSquare(tab.moveto[row], tab.winLose[row], tab.coloring, tab.minWin, tab.maxLose);
+
+        board.MarkSquare(tab.movefrom[row]); // May change this
+
+        board.MarkSquare(tab.moveto[row], tab.winLose[row], tab.coloring, tab.minWin, tab.maxLose); // Colors square based on winLoseDraw value
+    
+        // Uncolors all existing squares with default VVH colors
         if(tab.coloring){
             for(var i = 0; i < tab.sqVVH.length; i++){
                 if(tab.sqVVH[i] != undefined && i != tab.movefrom[row]){
@@ -1207,6 +1209,7 @@ function EndgameTable_Endingover(ev, ob) {
                 }
             }
         }
+
 	}
 }
 
@@ -1217,13 +1220,17 @@ function EndgameTable_Endingout(ev, ob) {
 	var tab = Objectmap.Get(ob.id.split('_')[0]);
 	if (tab.observer != null) {	
 		var row = ob.id.split('_')[1];
-		tab.observer.UnmarkSquare(tab.movefrom[row], tab.sqVVH[tab.movefrom[row]], tab.coloring, tab.minWin, tab.maxLose);
+
+        // Unmarks square with piece to default VVH color
+        tab.observer.UnmarkSquare(tab.movefrom[row], tab.sqVVH[tab.movefrom[row]],
+                tab.coloring, tab.minWin, tab.maxLose); 
 		tab.observer.UnmarkSquare(tab.moveto[row]);
+
         //Recolor all other squares
         if(tab.coloring){
             for(var i = 0; i < tab.sqVVH.length; i++){
                 if(tab.sqVVH[i] != undefined){
-                    tab.observer.MarkSquare(i, tab.sqVVH[i], tab.coloring, tab.minWin, tab.maxLose);
+                    tab.observer.ColorSquare(i, tab.sqVVH[i], tab.minWin, tab.maxLose);
                 }
             }
         }
