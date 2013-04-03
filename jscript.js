@@ -952,7 +952,7 @@ function EndgameTable(posx, posy, tabheight, lang, position) {
     //VVH Variables
     this.coloring = true;
     this.winLose = new Array(); //Stores the win lose draw value for each row in the endgame table.
-    this.sqVVH = new Array(64); //Stores the highest value for a certain square. Highest Value is considered Win in least --> Draw --> Lose;
+    this.sqVVH = new Array(64);  //Stores all moves for said square.
     this.minWin = 0;
     this.maxLose = 0;
 }
@@ -1050,7 +1050,10 @@ function EndgameTable_SetData(moves) {
             if(this.sqVVH[f] == undefined){
                 this.observer.ColorSquare(f, winTxt, this.minWin, 
                         this.maxLose);
-                this.sqVVH[f] = winTxt;
+                this.sqVVH[f] = new Array();
+                this.sqVVH[f].push(winTxt);
+            } else {
+                this.sqVVH[f].push(winTxt);
             }
         }
 		
@@ -1222,7 +1225,7 @@ function EndgameTable_Endingout(ev, ob) {
 		var row = ob.id.split('_')[1];
 
         // Unmarks square with piece to default VVH color
-        tab.observer.UnmarkSquare(tab.movefrom[row], tab.sqVVH[tab.movefrom[row]],
+        tab.observer.UnmarkSquare(tab.movefrom[row], tab.sqVVH[tab.movefrom[row]][0],
                 tab.coloring, tab.minWin, tab.maxLose); 
 		tab.observer.UnmarkSquare(tab.moveto[row]);
 
@@ -1230,7 +1233,7 @@ function EndgameTable_Endingout(ev, ob) {
         if(tab.coloring){
             for(var i = 0; i < tab.sqVVH.length; i++){
                 if(tab.sqVVH[i] != undefined){
-                    tab.observer.ColorSquare(i, tab.sqVVH[i], tab.minWin, tab.maxLose);
+                    tab.observer.ColorSquare(i, tab.sqVVH[i][0], tab.minWin, tab.maxLose);
                 }
             }
         }
