@@ -1048,11 +1048,13 @@ function EndgameTable_SetData(moves) {
             }
             
             if(this.sqVVH[f] == undefined){
+                this.sqVVH[f] = new Array();
+                winTxt.push(t);
+                this.sqVVH[f].push(winTxt);
                 this.observer.ColorSquare(f, winTxt, this.minWin, 
                         this.maxLose);
-                this.sqVVH[f] = new Array();
-                this.sqVVH[f].push(winTxt);
             } else {
+                winTxt.push(t);
                 this.sqVVH[f].push(winTxt);
             }
         }
@@ -1069,6 +1071,7 @@ function EndgameTable_SetData(moves) {
 			txt += '<td width="'+lengths[i]+'" '+thestyle+'>'+moves[k][i]+'</td>';
 		}
 		txt += '</tr>';
+
 	}
 	txt += '</table>';
 	document.getElementById(this.tableid+'_body').innerHTML = txt;
@@ -1833,8 +1836,12 @@ var RED = 'rgba(139,0,0,';//Red 4
 var YELLOW = 'rgb(255,255,0)';
 var GREEN = 'rgba(0,127,0,';
 var RGB = 'rgb(';
+
+//ABSTRACTION for wintxt
 var INMOVES = 3;
 var POSRESULT = 1;
+var TO = 4;
+var TODRAW = 2;
 
 //Takes in a String whose value should either be Win, Draw, or Lose
 //Returns the RED, YELLOW, GREEN constants
