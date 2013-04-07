@@ -498,6 +498,7 @@ function Board(sqsize, darkcolor, lightcolor, posx, posy) {
 	this.hasmarked = _f;
 	this.setuptable = null;
 	this.allowfreemoving = false;
+    this.endgametable; 
 	this.bordercolor = 'rgb(207,213,223)';
 	var d = this.GetDivElement();	
 	document.getElementsByTagName("body")[0].appendChild(d);
@@ -519,12 +520,12 @@ function Board_GetDivElement() {
 		var to = (7-r) * this.sqsize;
 		var col = ((r % 2) == (f % 2)) ? this.darkcolor : this.lightcolor;
 		var sqid = this.boardid+"_"+i;
-		result += "<div id=\""+sqid+"\" style=\"position:absolute;left:"+le+";top:"+to+";width:"+this.sqsize+";height:"+this.sqsize+";background-color:"+col+";\" onmousedown=\"Board.Mousedown(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmousemove=\"Board.Mousemove(event,this);\" ></div>\n";	
+		result += "<div id=\""+sqid+"\" style=\"position:absolute;left:"+le+";top:"+to+";width:"+this.sqsize+";height:"+this.sqsize+";background-color:"+col+";\" onmousedown=\"Board.Mousedown(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmousemove=\"Board.Mousemove(event,this);\"  onmouseover=\"Board.Mouseover(event,this);\"></div>\n";	
 	}
-	result += "<div id=\""+this.boardid+"_dr\" style=\"position:absolute;left:"+0+";top:"+0+";visibility:hidden;\" onmousedown=\"Board.Mousedown(event,this);\" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\"><img src=\""+piecegraphics[0]+"\" ></div>\n";	
-	result += '<div id="'+this.boardid+'_pro0" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\"> </div>';
-	result += '<div id="'+this.boardid+'_pro1" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\"> </div>';
-	result += '<div id="'+this.boardid+'_pro2" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\"> </div>';
+	result += "<div id=\""+this.boardid+"_dr\" style=\"position:absolute;left:"+0+";top:"+0+";visibility:hidden;\" onmousedown=\"Board.Mousedown(event,this);\" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\"><img src=\""+piecegraphics[0]+"\" ></div>\n";	
+	result += '<div id="'+this.boardid+'_pro0" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\"> </div>';
+	result += '<div id="'+this.boardid+'_pro1" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\"> </div>';
+	result += '<div id="'+this.boardid+'_pro2" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\"> </div>';
 
 	result += '<div id="'+this.boardid+'_miw" style="position:absolute;left:'+(this.sqsize*8+20)+';top:'+(this.sqsize*7)+';width:'+this.sqsize+';height:'+this.sqsize+';visibility:visible;" onmousedown=\"Board.Mousedownmoveind(event,this);\"><img src="'+moveindicatorgraphics[0]+'"></div>';
 	result += '<div id="'+this.boardid+'_mib" style="position:absolute;left:'+(this.sqsize*8+20)+';top:'+(0)+';width:'+this.sqsize+';height:'+this.sqsize+';visibility:visible;" onmousedown=\"Board.Mousedownmoveind(event,this);\"><img src="'+moveindicatorgraphics[2]+'"></div>';
@@ -696,6 +697,25 @@ Board.Mousemove = Board_Mousemove;
 
 
 
+function Board_Mouseover(ev,ob) {
+    var o = Objectmap.Get(ob.id.split('_')[0]);
+    if(o.endgametable.coloring){
+        var sq = eval(ob.id.split('_')[1]);
+        var moveList = o.endgametable.sqVVH[sq]
+        if(moveList == undefined){
+            return;
+        }
+        for(var i = 0; i < moveList.length; i++){
+            if(moveList[i][POSRESULT] == "Draw"){
+                var to = TODRAW;
+            } else {
+                var to = TO;
+            }
+           o.MarkSquare(moveList[i][to], moveList[i], o.endgametable.coloring, o.endgametable.minWin, o.endgametable.maxLose);
+        }
+    }       
+}
+Board.Mouseover = Board_Mouseover;
 
 
 
@@ -1693,6 +1713,10 @@ function MG_IAS(p, s, W) {
 		}
 		
 	}
+
+    Board.prototype.setEndgameTable = function(et) {
+                                        this.endgametable = et;
+    }
 	
 	function buildIt() {
 		bwtm = new GuiRadio('<span style="font-family:verdana,arial,helvetica,sans-serif;font-size:11px;font-weight:bold;">'+'White to move'+'</span>',_t);
@@ -1708,6 +1732,7 @@ function MG_IAS(p, s, W) {
 		p.AddListener(b);
 		b.SetRefPosition(p);
 		et = new EndgameTable(400,60,279,"en",p);
+        b.setEndgameTable(et);
 		p.AddListener(et);
 		et.SetVisible(true);
 		et.SetObserver(b);
@@ -1720,6 +1745,7 @@ function MG_IAS(p, s, W) {
 		b.setuptable = st;
 		p.Clear();
 		
+        
 		bwtm.AddListener(em);
 		bbtm.AddListener(em);
 
