@@ -520,12 +520,12 @@ function Board_GetDivElement() {
 		var to = (7-r) * this.sqsize;
 		var col = ((r % 2) == (f % 2)) ? this.darkcolor : this.lightcolor;
 		var sqid = this.boardid+"_"+i;
-		result += "<div id=\""+sqid+"\" style=\"position:absolute;left:"+le+";top:"+to+";width:"+this.sqsize+";height:"+this.sqsize+";background-color:"+col+";\" onmousedown=\"Board.Mousedown(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmousemove=\"Board.Mousemove(event,this);\"  onmouseover=\"Board.Mouseover(event,this);\"></div>\n";	
+		result += "<div id=\""+sqid+"\" style=\"position:absolute;left:"+le+";top:"+to+";width:"+this.sqsize+";height:"+this.sqsize+";background-color:"+col+";border:thin solid rgb(207,211,222); \" onmousedown=\"Board.Mousedown(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmousemove=\"Board.Mousemove(event,this);\"  onmouseover=\"Board.Mouseover(event,this);\" onmouseout=\"Board.Mouseout(event,this);\" ></div>\n";	
 	}
-	result += "<div id=\""+this.boardid+"_dr\" style=\"position:absolute;left:"+0+";top:"+0+";visibility:hidden;\" onmousedown=\"Board.Mousedown(event,this);\" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\"><img src=\""+piecegraphics[0]+"\" ></div>\n";	
-	result += '<div id="'+this.boardid+'_pro0" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\"> </div>';
-	result += '<div id="'+this.boardid+'_pro1" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\"> </div>';
-	result += '<div id="'+this.boardid+'_pro2" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\"> </div>';
+	result += "<div id=\""+this.boardid+"_dr\" style=\"position:absolute;left:"+0+";top:"+0+";visibility:hidden;\" onmousedown=\"Board.Mousedown(event,this);\" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\" onmouseout=\"Board.Mouseout(event,this);\" ><img src=\""+piecegraphics[0]+"\" ></div>\n";	
+	result += '<div id="'+this.boardid+'_pro0" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\" onmouseout=\"Board.Mouseout(event,this);\" > </div>';
+	result += '<div id="'+this.boardid+'_pro1" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\" onmouseout=\"Board.Mouseout(event,this);\" > </div>';
+	result += '<div id="'+this.boardid+'_pro2" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\" onmouseout=\"Board.Mouseout(event,this);\" > </div>';
 
 	result += '<div id="'+this.boardid+'_miw" style="position:absolute;left:'+(this.sqsize*8+20)+';top:'+(this.sqsize*7)+';width:'+this.sqsize+';height:'+this.sqsize+';visibility:visible;" onmousedown=\"Board.Mousedownmoveind(event,this);\"><img src="'+moveindicatorgraphics[0]+'"></div>';
 	result += '<div id="'+this.boardid+'_mib" style="position:absolute;left:'+(this.sqsize*8+20)+';top:'+(0)+';width:'+this.sqsize+';height:'+this.sqsize+';visibility:visible;" onmousedown=\"Board.Mousedownmoveind(event,this);\"><img src="'+moveindicatorgraphics[2]+'"></div>';
@@ -705,6 +705,14 @@ function Board_Mouseover(ev,ob) {
         if(moveList == undefined){
             return;
         }
+
+        for(var i = 0; i < o.endgametable.sqVVH.length; i++){
+            var sqList = o.endgametable.sqVVH;
+            if(sqList[i] != undefined){
+                o.UnmarkSquare(i);
+            }
+        }
+            
         for(var i = 0; i < moveList.length; i++){
             if(moveList[i][POSRESULT] == "Draw"){
                 var to = TODRAW;
@@ -717,6 +725,34 @@ function Board_Mouseover(ev,ob) {
 }
 Board.Mouseover = Board_Mouseover;
 
+
+function Board_Mouseout(ev,ob) {
+    var o = Objectmap.Get(ob.id.split('_')[0]);
+    if(o.endgametable.coloring){
+        var sq = eval(ob.id.split('_')[1]);
+        var moveList = o.endgametable.sqVVH[sq]
+        if(moveList == undefined){
+            return;
+        }
+        
+        for(var i = 0; i < o.endgametable.sqVVH.length; i++){
+            if(o.endgametable.sqVVH[i] != undefined){
+                o.MarkSquare(i, moveList[0], o.endgametable.coloring, 
+                    o.endgametable.minWin, o.endgametable.maxLose);
+            }
+        }
+
+        for(var i = 0; i < moveList.length; i++){
+            if(moveList[i][POSRESULT] == "Draw"){
+                var to = TODRAW;
+            } else {
+                var to = TO;
+            }
+           o.UnmarkSquare(moveList[i][to]);
+        }
+    }       
+}
+Board.Mouseout = Board_Mouseout;
 
 
 
@@ -1853,6 +1889,15 @@ function takeback() {
 //Colors 
 function Board_ColorSquare(sq,winTxt, minWin, maxLose){
     document.getElementById(this.boardid+"_"+sq).style.background = getColor(winTxt,minWin,maxLose);
+
+    /*
+    for(var i = 0; i < 64; i++){
+        document.getElementById(this.boardid+"_"+i).style.border = 
+            "thin solid rgb(207,211,222)" ;
+            //"thin solid rgb(181,189,206)";
+            //"thin solid rgb(233,236,240)" ;
+    }
+    */
 }
 
 Board.prototype.ColorSquare = Board_ColorSquare;
@@ -1876,10 +1921,10 @@ function getColor(winTxt, minWin, maxLose){
     if(winLoseDraw == "Win"){
         for(var i = 1; i < 4; i++){
             if(winTxt[INMOVES] <= i*minWin){
-                return getOpacity(i, "Win");
+                return GREEN +   getOpacity(i, "Win");
             }
         }
-        return getOpacity(4);
+        return GREEN + getOpacity(4);
     } 
     else if(winLoseDraw == "Draw"){
         return YELLOW;
@@ -1887,15 +1932,16 @@ function getColor(winTxt, minWin, maxLose){
     else {
         for(var i = 1; i < 4; i++){
             if(winTxt[INMOVES] >= maxLose - maxLose*i/4){
-                return getOpacity(i, "Lose");
+                return RED +  getOpacity(i, "Lose");
             }
         }
-        return getOpacity(4, "Lose");
+        return RED +  getOpacity(4, "Lose");
     }
 }
 
 //Helper function for get color. Get color returns the opacity class, which
 //is a number from one to four. 
+/*
 function getOpacity(num, winLose){
     if(winLose == "Win"){
         if(num == 1){
@@ -1919,5 +1965,19 @@ function getOpacity(num, winLose){
         }
     }
 }
+*/
 
-    
+function getOpacity(i){
+    var txt;
+    if(i == 1){
+        txt = 1;
+    } else if(i == 2) {
+        txt =  .75;
+    } else if(i == 3) {
+        txt = .50;
+    }  else { 
+        txt = .25;
+    }
+    txt += ')' ;
+    return txt;
+}
