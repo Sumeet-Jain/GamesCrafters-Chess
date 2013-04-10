@@ -1075,6 +1075,7 @@ function EndgameTable_SetObserver(board) {
 EndgameTable.prototype.SetObserver = EndgameTable_SetObserver;
 
 function EndgameTable_SetData(moves) {
+    this.observer.UnmarkAll();
 	if (moves.length == 0 && this.posval.length == 0) {
 		this.ShowNoInfoAvailable();
 		return;
@@ -2001,7 +2002,8 @@ function Board_IterThroughSqVVH(currSq, nextSq){
     for(var i = 0; i < moveList.length; i++){
         var winTxt = moveList[i];
         if(winTxt[winTxt.length - 1] == nextSq){
-            this.MarkSquare(nextSq, winTxt, this.endgametable.coloring);
+            this.MarkSquare(nextSq, winTxt, this.endgametable.coloring,
+                    this.endgametable.minWin, this.endgametable.maxLose);
         }
     }
 }
