@@ -623,7 +623,7 @@ function Board_Mousedown(ev, ob) {
 	var promosq = new Array();
 	if (o.allowfreemoving==_f) {
 		for (var i = 0; i < set.length; i++) {
-			if ((set[i]&63) == sq) { o.MarkSquare((set[i]>>6)&63); moveable = true; if(((set[i]>>12)&63)>0) promosq.push((set[i]>>6)&63);}
+			if ((set[i]&63) == sq) { o.MarkSquare(set[i]&63,o.endgametable.sqVVH[sq][0], o.endgametable.coloring); moveable = true; if(((set[i]>>12)&63)>0) promosq.push((set[i]>>6)&63);}
 		}	
 	}
 	else {
@@ -631,7 +631,14 @@ function Board_Mousedown(ev, ob) {
 		if (sq <=15 && o.position.b[sq] == 12) {if (o.position.b[sq-8] == 0)promosq.push(sq-8); if (sq != 8 && o.position.b[sq-9] > 0 && o.position.b[sq-9] < 7) promosq.push(sq-9);if (sq != 15 && o.position.b[sq-7] > 0 && o.position.b[sq-7] < 7) promosq.push(sq-7); }
 		if (o.position.b[sq] > 0) moveable = true;
 		for (var i = 0; i < set.length; i++) {
-			if ((set[i]&63) == sq) { o.MarkSquare((set[i]>>6)&63);}
+            var checking = ((set[i]>>6) & 63);
+			if ((set[i]&63) == sq) { 
+                if(!o.endgametable.coloring){
+                    o.MarkSquare(checking);
+                } else {
+                    o.IterThroughSqVVH(sq, checking);
+                }
+            }
 		}	
 	}
 	if (promosq.length>0) {promosq.sort();for(var i=1;i<promosq.length;i++) if (promosq[i]==promosq[i-1]){promosq.splice(i,1);i--;}  }
@@ -700,7 +707,7 @@ Board.Mousemove = Board_Mousemove;
 function Board_Mouseover(ev,ob) {
     var o = Objectmap.Get(ob.id.split('_')[0]);
     if(o.endgametable.coloring){
-        var sq = eval(ob.id.split('_')[1]);
+        var sq = ob.id.split('_')[1];
         var moveList = o.endgametable.sqVVH[sq]
         if(moveList == undefined){
             return;
@@ -729,7 +736,7 @@ Board.Mouseover = Board_Mouseover;
 function Board_Mouseout(ev,ob) {
     var o = Objectmap.Get(ob.id.split('_')[0]);
     if(o.endgametable.coloring){
-        var sq = eval(ob.id.split('_')[1]);
+        var sq = ob.id.split('_')[1];
         var moveList = o.endgametable.sqVVH[sq]
         if(moveList == undefined){
             return;
@@ -863,6 +870,11 @@ Board.prototype.SetVisible = Board_SetVisible;
 
 
 function Board_MarkSquare(sq, winTxt, coloring, minWin, maxLose) {
+    if(minWin == undefined){
+        minWin = this.endgametable.minWin;
+    } else if (maxLose == undefined){
+        maxLose = this.endgametable.maxLose;
+    }
     if(!coloring){
         var f = sq & 7;
         var r = sq >> 3;
@@ -1315,6 +1327,7 @@ function EndgameTable_Endingdown(ev, ob) {
 EndgameTable.Endingdown = EndgameTable_Endingdown;
 
 function EndgameTable_PositionChanged(pos) {
+    this.observer.UnmarkAll();
 	this.RequestData(pos);
 }
 
@@ -1982,3 +1995,15 @@ function getOpacity(i){
     txt += ')' ;
     return txt;
 }
+
+function Board_IterThroughSqVVH(currSq, nextSq){
+    var moveList = this.endgametable.sqVVH[currSq];
+    for(var i = 0; i < moveList.length; i++){
+        var winTxt = moveList[i];
+        if(winTxt[winTxt.length - 1] == nextSq){
+            this.MarkSquare(nextSq, winTxt, this.endgametable.coloring);
+        }
+    }
+}
+
+Board.prototype.IterThroughSqVVH = Board_IterThroughSqVVH;
