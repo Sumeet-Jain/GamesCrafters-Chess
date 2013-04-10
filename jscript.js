@@ -737,8 +737,9 @@ function Board_Mouseout(ev,ob) {
         
         for(var i = 0; i < o.endgametable.sqVVH.length; i++){
             if(o.endgametable.sqVVH[i] != undefined){
-                o.MarkSquare(i, moveList[0], o.endgametable.coloring, 
-                    o.endgametable.minWin, o.endgametable.maxLose);
+                o.MarkSquare(i, o.endgametable.sqVVH[i][0],
+                        o.endgametable.coloring, o.endgametable.minWin,
+                        o.endgametable.maxLose);
             }
         }
 
