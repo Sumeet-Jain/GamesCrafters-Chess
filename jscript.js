@@ -709,7 +709,7 @@ function Board_Mouseover(ev,ob) {
     if(o.endgametable.coloring){
         var sq = ob.id.split('_')[1];
         var moveList = o.endgametable.sqVVH[sq]
-        if(moveList == undefined){
+        if(moveList == undefined || document.getElementById(o.boardid+"_"+sq).hasChildNodes() === false){
             return;
         }
 
@@ -872,7 +872,8 @@ Board.prototype.SetVisible = Board_SetVisible;
 function Board_MarkSquare(sq, winTxt, coloring, minWin, maxLose) {
     if(minWin == undefined){
         minWin = this.endgametable.minWin;
-    } else if (maxLose == undefined){
+    } 
+    if (maxLose == undefined){
         maxLose = this.endgametable.maxLose;
     }
     if(!coloring){
@@ -1021,7 +1022,7 @@ function EndgameTable(posx, posy, tabheight, lang, position) {
     //VVH Variables
     this.coloring = true;
     this.winLose = new Array(); //Stores the win lose draw value for each row in the endgame table.
-    this.sqVVH = new Array(64);  //Stores all moves for said square.
+    this.sqVVH = new Array(64);  //Stores all winTxt for said square.
     this.minWin = 0;
     this.maxLose = 0;
 }
@@ -1076,14 +1077,13 @@ EndgameTable.prototype.SetObserver = EndgameTable_SetObserver;
 
 function EndgameTable_SetData(moves) {
     this.observer.UnmarkAll();
+    this.sqVVH = new Array(64);
+
 	if (moves.length == 0 && this.posval.length == 0) {
 		this.ShowNoInfoAvailable();
 		return;
 	}
 
-    if(this.coloring){
-        this.sqVVH = new Array(64);
-    }
 		
 	var txt = '<table border="0" cellpadding="0" cellspacing="0">';
     var setMaxLose = false;
@@ -1186,7 +1186,11 @@ function EndgameTable_RequestData(pos) {
 			this.cacheresults[0] = null;
 		}
 	}
-	else this.ShowNoInfoAvailable();
+	else {
+        this.ShowNoInfoAvailable();
+        this.sqVVH = new Array(64);
+        this.observer.UnmarkAll();
+    }
 }
 
 EndgameTable.prototype.RequestData = EndgameTable_RequestData;
@@ -1298,8 +1302,11 @@ function EndgameTable_Endingout(ev, ob) {
 		var row = ob.id.split('_')[1];
 
         // Unmarks square with piece to default VVH color
-        tab.observer.UnmarkSquare(tab.movefrom[row], tab.sqVVH[tab.movefrom[row]][0],
-                tab.coloring, tab.minWin, tab.maxLose); 
+        if(tab.coloring == false){
+            tab.observer.UnmarkSquare(tab.movefrom[row]);
+        } else {
+            tab.observer.UnmarkSquare(tab.movefrom[row], tab.sqVVH[tab.movefrom[row]][0], tab.coloring, tab.minWin, tab.maxLose); 
+        }
 		tab.observer.UnmarkSquare(tab.moveto[row]);
 
         //Recolor all other squares
@@ -1811,8 +1818,7 @@ function MG_IAS(p, s, W) {
 	
 		
 		document.getElementsByTagName("body")[0].appendChild(d);
-
-	}
+    }
 
 	
 	function flip() {
@@ -1917,7 +1923,7 @@ function Board_ColorSquare(sq,winTxt, minWin, maxLose){
 
 Board.prototype.ColorSquare = Board_ColorSquare;
 
-//Color constants
+//Color constants that are missing opacities.
 var RED = 'rgba(139,0,0,';//Red 4
 var YELLOW = 'rgb(255,255,0)';
 var GREEN = 'rgba(0,127,0,';
@@ -1999,6 +2005,9 @@ function getOpacity(i){
 
 function Board_IterThroughSqVVH(currSq, nextSq){
     var moveList = this.endgametable.sqVVH[currSq];
+    if(moveList == undefined){
+        return;
+    }
     for(var i = 0; i < moveList.length; i++){
         var winTxt = moveList[i];
         if(winTxt[winTxt.length - 1] == nextSq){
