@@ -82,7 +82,7 @@ enmouse(false);
 <body onload="javascript:setTimeout('buildIt()',5);" onkeyup="keypress(event);">
 
 <!-- Canvas for arrows -->
-<canvas id="canvas" width="1000" height="1000"></canvas>
+<canvas id="canvas" width="300" height="300" style = "position: absolute; z-index: 5; pointer-events: none"></canvas>
 
 <div class="info" style="position:absolute; left:0; top:362;" >FEN:</div>
 <div id="info" class="info" onmouseover="enmouse(true);" onmouseout="enmouse(false);" style="position:absolute; left:30; top:362;" ></input></div>
