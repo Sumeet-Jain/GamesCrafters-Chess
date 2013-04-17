@@ -1,4 +1,15 @@
-var sqsize = 41;function responseHandler0() { reqcollection[0].HandleResponse(); }
+/*TODO
+ * 1)  Resize piece files
+ * 2) Mabye redo some of the layout stuff. If we have time, make each position of the div tags a function of sqsize
+ * 3) ******ARROWS BY SATURDAY********
+ *      a). Need two functions, one that creates nd draws arrows, the other that erases them.
+ *      b). main thing we need done.
+ * 4) A bug in the server call. The url this guy uses has two fen string variables in the xml get. Sometimes, the server call
+ *      returns with a error for white, and a list of moves for black. I think the two fen string variables cause this error. 
+ *      Only happens some of the times though; 
+*/
+
+var sqsize = 81;function responseHandler0() { reqcollection[0].HandleResponse(); }
 function responseHandler1() { reqcollection[1].HandleResponse(); }
 function responseHandler2() { reqcollection[2].HandleResponse(); }
 function responseHandler3() { reqcollection[3].HandleResponse(); }
@@ -176,14 +187,15 @@ function scrollOffsetY() {
 		return document.body.scrollTop;
 	}
 }
-var piecegraphics = new Array("images/a"+sqsize+"free.gif","images/a"+sqsize+"wk.gif","images/a"+sqsize+"wq.gif","images/a"+sqsize+"wr.gif","images/a"+sqsize+"wb.gif","images/a"+sqsize+"wn.gif","images/a"+sqsize+"wp.gif",
-"images/a"+sqsize+"bk.gif","images/a"+sqsize+"bq.gif","images/a"+sqsize+"br.gif","images/a"+sqsize+"bb.gif","images/a"+sqsize+"bn.gif","images/a"+sqsize+"bp.gif");
-var moveindicatorgraphics = new Array("images/a"+sqsize+"mw0.gif","images/a"+sqsize+"mw1.gif","images/a"+sqsize+"mb0.gif","images/a"+sqsize+"mb1.gif");
-var emptyboardgraphics = "images/a"+sqsize+"empty.gif";
-var startboardgraphics = "images/a"+sqsize+"start.gif";
-var promowgraphics = "images/a"+sqsize+"promow.gif";
-var promobgraphics = "images/a"+sqsize+"promob.gif";
-var movegraphics = "images/a"+sqsize+"move.gif";
+var picSize = 41;
+var piecegraphics = new Array("images/a"+picSize+"free.gif","images/a"+picSize+"wk.gif","images/a"+picSize+"wq.gif","images/a"+picSize+"wr.gif","images/a"+picSize+"wb.gif","images/a"+picSize+"wn.gif","images/a"+picSize+"wp.gif",
+"images/a"+picSize+"bk.gif","images/a"+picSize+"bq.gif","images/a"+picSize+"br.gif","images/a"+picSize+"bb.gif","images/a"+picSize+"bn.gif","images/a"+picSize+"bp.gif");
+var moveindicatorgraphics = new Array("images/a"+picSize+"mw0.gif","images/a"+picSize+"mw1.gif","images/a"+picSize+"mb0.gif","images/a"+picSize+"mb1.gif");
+var emptyboardgraphics = "images/a"+picSize+"empty.gif";
+var startboardgraphics = "images/a"+picSize+"start.gif";
+var promowgraphics = "images/a"+picSize+"promow.gif";
+var promobgraphics = "images/a"+picSize+"promob.gif";
+var movegraphics = "images/a"+picSize+"move.gif";
 var _f=false, _t=true;
 
 
@@ -1023,8 +1035,8 @@ function EndgameTable(posx, posy, tabheight, lang, position) {
     this.coloring = true;
     this.winLose = new Array(); //Stores the win lose draw value for each row in the endgame table.
     this.sqVVH = new Array(64);  //Stores all winTxt for said square.
-    this.minWin = 0;
-    this.maxLose = 0;
+    this.minWins = new Array(4);
+    this.maxLose = new Array(4);
 }
 
 function EndgameTable_GetDivElement() {
@@ -1086,8 +1098,12 @@ function EndgameTable_SetData(moves) {
 
 		
 	var txt = '<table border="0" cellpadding="0" cellspacing="0">';
-    var setMaxLose = false;
-    var setMinWin = false;
+    var minWinPos = 0;
+    var maxLosePos = 0;
+    this.minWin = new Array(4);
+    this.maxLose = new Array(4);
+    var oldWin = -1;
+    var oldLose = -1;
 	for (var k = 0; k < moves.length; k++) {
         
 
@@ -1107,14 +1123,16 @@ function EndgameTable_SetData(moves) {
 
         if(this.coloring){
 
-            if(winTxt[POSRESULT] === "Win" && setMinWin === false) {
-                setMinWin = true;
-                this.minWin = winTxt[INMOVES];
+            if(winTxt[POSRESULT] === "Win" && minWinPos < 4 && oldWin != winTxt[INMOVES]) {
+                this.minWin[minWinPos] = winTxt[INMOVES];
+                minWinPos++;
+                oldWin = winTxt[INMOVES];
             }
 
-            if(winTxt[POSRESULT] === "Lose" && setMaxLose === false){
-                setMaxLose = true;
-                this.maxLose = winTxt[INMOVES];
+            if(winTxt[POSRESULT] === "Lose" && maxLosePos < 4 && oldLose != winTxt[INMOVES]){
+                this.maxLose[maxLosePos] = winTxt[INMOVES];
+                maxLosePos++;
+                oldLose = winTxt[INMOVES];
             }
             
             if(this.sqVVH[f] == undefined){
@@ -1336,6 +1354,7 @@ EndgameTable.Endingdown = EndgameTable_Endingdown;
 
 function EndgameTable_PositionChanged(pos) {
     this.observer.UnmarkAll();
+    this.sqVVH = new Array(64);
 	this.RequestData(pos);
 }
 
@@ -1789,7 +1808,7 @@ function MG_IAS(p, s, W) {
 		b.allowfreemoving = true;
 		p.AddListener(b);
 		b.SetRefPosition(p);
-		et = new EndgameTable(400,60,279,"en",p);
+		et = new EndgameTable(800,60,558,"en",p);
         b.setEndgameTable(et);
 		p.AddListener(et);
 		et.SetVisible(true);
@@ -1797,7 +1816,7 @@ function MG_IAS(p, s, W) {
 		em = new EndgameManager();
 		p.AddListener(em);
 
-		st = new SetupTable(0,389,'de',p);
+		st = new SetupTable(0,758,'de',p);
 		st.SetVisible(true);
 		st.inputboard = b;
 		b.setuptable = st;
@@ -1810,7 +1829,7 @@ function MG_IAS(p, s, W) {
 		
 		var d = document.createElement("div");
 		d.style.position = 'absolute';
-		d.style.left = 400;
+		d.style.left = 800;
 		d.style.top = 10;
 		d.style.height = 30;
 		d.style.width = 250;
@@ -1940,23 +1959,23 @@ var TODRAW = 2;
 function getColor(winTxt, minWin, maxLose){
     var winLoseDraw = winTxt[POSRESULT];
     if(winLoseDraw == "Win"){
-        for(var i = 1; i < 4; i++){
-            if(winTxt[INMOVES] <= i*minWin){
+        for(var i = 0; i < 4; i++){
+            if(winTxt[INMOVES] == minWin[i]){
                 return GREEN +   getOpacity(i, "Win");
             }
         }
-        return GREEN + getOpacity(4);
+        return GREEN + getOpacity(3);
     } 
     else if(winLoseDraw == "Draw"){
         return YELLOW;
     }
     else {
-        for(var i = 1; i < 4; i++){
-            if(winTxt[INMOVES] >= maxLose - maxLose*i/4){
+        for(var i = 0; i < 4; i++){
+            if(winTxt[INMOVES] == maxLose[i]) {
                 return RED +  getOpacity(i, "Lose");
             }
         }
-        return RED +  getOpacity(4, "Lose");
+        return RED +  getOpacity(3, "Lose");
     }
 }
 
@@ -1990,11 +2009,11 @@ function getOpacity(num, winLose){
 
 function getOpacity(i){
     var txt;
-    if(i == 1){
+    if(i == 0){
         txt = 1;
-    } else if(i == 2) {
+    } else if(i == 1) {
         txt =  .75;
-    } else if(i == 3) {
+    } else if(i == 2) {
         txt = .50;
     }  else { 
         txt = .25;
