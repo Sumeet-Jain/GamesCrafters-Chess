@@ -83,16 +83,16 @@ enmouse(false);
 <!-- Canvas for arrows -->
 <canvas id="canvas" width="300" height="300" style = "position: absolute; align: left; z-index: 5; pointer-events: none"></canvas>
 
-<div class="info" style="position:absolute; left:0; top:690;" >FEN:</div>
-<div id="info" class="info" onmouseover="enmouse(true);" onmouseout="enmouse(false);" style="position:absolute; left:30; top:690;" ></input></div>
+<div class="info" style="position:absolute; left:0; top:530;" >FEN:</div>
+<div id="info" class="info" onmouseover="enmouse(true);" onmouseout="enmouse(false);" style="position:absolute; left:30; top:530;" ></input></div>
 
 
 <!-- CREATING THE BUTTONS-->
-<div class="button" style="position:absolute; left:800; top:758;" onmouseover="over(this);" onmouseout="leave(this);" onclick="flip();" >Flip Board</div>
+<div class="button" style="position:absolute; left:600; top:558;" onmouseover="over(this);" onmouseout="leave(this);" onclick="flip();" >Flip Board</div>
 
-<div class="button" style="position:absolute; left:800; top:785;" onmouseover="over(this);" onmouseout="leave(this);" onclick="inputfen();" >Input FEN</div>
+<div class="button" style="position:absolute; left:600; top:585;" onmouseover="over(this);" onmouseout="leave(this);" onclick="inputfen();" >Input FEN</div>
 
-<div class="button" style="position:absolute; left:800; top:812;" onmouseover="over(this);" onmouseout="leave(this);" onclick="takeback();" >Back</div>
+<div class="button" style="position:absolute; left:600; top:612;" onmouseover="over(this);" onmouseout="leave(this);" onclick="takeback();" >Back</div>
 
 </body>
 

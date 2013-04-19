@@ -5,7 +5,8 @@ $hook = $_GET['hook'];
 $action = $_GET['action'];
 $fen = $_GET['fen'];
 
-$response = file_get_contents("http://k4it.de/egtb/fetchegtbGC.php?obid=$obid&reqid=$reqid&hook=$hook&action=$action&fen=$fen");
+
+$response = file_get_contents("http://k4it.de/egtb/fetch.php?obid=$obid&reqid=$reqid&hook=$hook&action=$action&fen=$fen");
 
 echo $response;
 ?>

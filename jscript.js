@@ -1,15 +1,19 @@
 /*TODO
- * 1)  Resize piece files
- * 2) Mabye redo some of the layout stuff. If we have time, make each position of the div tags a function of sqsize
+ * 1) Resize piece files
+ * 2) Mabye redo some of the layout stuff. If we have time, make each position of the div tags a function of sqsize. 
  * 3) ******ARROWS BY SATURDAY********
  *      a). Need two functions, one that creates nd draws arrows, the other that erases them.
  *      b). main thing we need done.
  * 4) A bug in the server call. The url this guy uses has two fen string variables in the xml get. Sometimes, the server call
  *      returns with a error for white, and a list of moves for black. I think the two fen string variables cause this error. 
  *      Only happens some of the times though; 
+ * 5) Another bug: When clicking a empty square when having the drag 
+ *      piece on, it uncolors the whole board.
+ * 6) With drag piece, if the mouse is on the edge of two squares when
+ *      clicking, it doesnt color squares properly.
 */
 
-var sqsize = 81;function responseHandler0() { reqcollection[0].HandleResponse(); }
+var sqsize = 61;function responseHandler0() { reqcollection[0].HandleResponse(); }
 function responseHandler1() { reqcollection[1].HandleResponse(); }
 function responseHandler2() { reqcollection[2].HandleResponse(); }
 function responseHandler3() { reqcollection[3].HandleResponse(); }
@@ -213,7 +217,7 @@ function Position() {
 	this.lastmove = 0;
 	this.makemovetext = false;
 	this.lastmovetext = null;
-		this.piececodes = new Array('','K','Q','R','B','N','','K','Q','R','B','N',''); 
+    this.piececodes = new Array('','K','Q','R','B','N','','K','Q','R','B','N',''); 
 	
 }
 
@@ -534,7 +538,7 @@ function Board_GetDivElement() {
 		var sqid = this.boardid+"_"+i;
 		result += "<div id=\""+sqid+"\" style=\"position:absolute;left:"+le+";top:"+to+";width:"+this.sqsize+";height:"+this.sqsize+";background-color:"+col+";border:thin solid rgb(207,211,222); \" onmousedown=\"Board.Mousedown(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmousemove=\"Board.Mousemove(event,this);\"  onmouseover=\"Board.Mouseover(event,this);\" onmouseout=\"Board.Mouseout(event,this);\" ></div>\n";	
 	}
-	result += "<div id=\""+this.boardid+"_dr\" style=\"position:absolute;left:"+0+";top:"+0+";visibility:hidden;\" onmousedown=\"Board.Mousedown(event,this);\" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\" onmouseout=\"Board.Mouseout(event,this);\" ><img src=\""+piecegraphics[0]+"\" ></div>\n";	
+	result += "<div id=\""+this.boardid+"_dr\" style=\"position:absolute;left:"+0+";top:"+0+";visibility:hidden;\" onmousedown=\"Board.Mousedown(event,this);\" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\" onmouseout=\"Board.Mouseout(event,this);\" ><img style = \"width = '150%'\" src=\""+piecegraphics[0]+"\" style = \"width: " + sqsize + "px\" ></div>\n";	
 	result += '<div id="'+this.boardid+'_pro0" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\" onmouseout=\"Board.Mouseout(event,this);\" > </div>';
 	result += '<div id="'+this.boardid+'_pro1" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\" onmouseout=\"Board.Mouseout(event,this);\" > </div>';
 	result += '<div id="'+this.boardid+'_pro2" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\" onmouseout=\"Board.Mouseout(event,this);\" > </div>';
@@ -572,7 +576,8 @@ Board.prototype.GetDivElement = Board_GetDivElement;
 
 function Board_SetPieceAt(s,p) {
 	if (this.currentpieces[s] == p) return;
-	document.getElementById(this.boardid+"_"+s).innerHTML = "<img src=\""+piecegraphics[p]+"\">";
+	//document.getElementById(this.boardid+"_"+s).innerhtml = "<img src=\""+piecegraphics[p]+"\" style = \"width: " + sqsize + "px\">" 
+    document.getElementById(this.boardid+"_"+s).innerHTML = "<img src=\""+piecegraphics[p]+"\" style = \"width: " + sqsize + "px\" >";
 	this.currentpieces[s] = p;
 }
 Board.prototype.SetPieceAt = Board_SetPieceAt;
@@ -664,7 +669,7 @@ function Board_Mousedown(ev, ob) {
 	var eldr = o.boardid+"_dr";
 
 	o.SetPieceAt(sq,0);
-	document.getElementById(eldr).innerHTML = "<img src=\""+piecegraphics[o.liftedpiece]+"\">";
+	document.getElementById(eldr).innerHTML = "<img src=\""+piecegraphics[o.liftedpiece]+"\" style = \"width: " + sqsize + "px\">"
  
  	var x = ev.clientX - document.getElementById(o.boardid).offsetLeft + scrollOffsetX();
 	var y = ev.clientY - document.getElementById(o.boardid).offsetTop + scrollOffsetY();
@@ -721,7 +726,7 @@ function Board_Mouseover(ev,ob) {
     if(o.endgametable.coloring){
         var sq = ob.id.split('_')[1];
         var moveList = o.endgametable.sqVVH[sq]
-        if(moveList == undefined || document.getElementById(o.boardid+"_"+sq).hasChildNodes() === false){
+        if(moveList == undefined){
             return;
         }
 
@@ -1496,13 +1501,13 @@ function SetupTable_GetDivElement() {
 		var to = r * this.sqsize;
 		var col = ((r % 2) == (f % 2)) ? this.darkcolor : this.lightcolor;
 		var sqid = this.tableid+"_"+i;
-		result += "<div id=\""+sqid+"\" style=\"position:absolute;left:"+le+";top:"+to+";background-color:"+col+";\" onmousedown=\"SetupTable.Mousedown(event,this);\" ><img src=\""+piecegraphics[i]+"\" ></div>\n";	
+		result += "<div id=\""+sqid+"\" style=\"position:absolute;left:"+le+";top:"+to+";background-color:"+col+";\" onmousedown=\"SetupTable.Mousedown(event,this);\" ><img src=\""+piecegraphics[i]+"\" style = \"width: " + sqsize + "px\" ></div>\n";	
 	}
 
-	result += "<div id=\""+this.tableid+"_move\" style=\"position:absolute;left:"+(6*this.sqsize)+";top:0;background-color:"+this.darkcolor+"\" onmousedown=\"SetupTable.Mousedown(event,this);\" ><img src=\""+movegraphics+"\" ></div>\n";	
-	result += "<div id=\""+this.tableid+"_0\" style=\"position:absolute;left:"+(6*this.sqsize)+";top:"+this.sqsize+";background-color:"+this.lightcolor+"\" onmousedown=\"SetupTable.Mousedown(event,this);\" ><img src=\""+piecegraphics[0]+"\" ></div>\n";	
+	result += "<div id=\""+this.tableid+"_move\" style=\"position:absolute;left:"+(6*this.sqsize)+";top:0;background-color:"+this.darkcolor+"\" onmousedown=\"SetupTable.Mousedown(event,this);\" ><img src=\""+movegraphics+"\" style = \"width: " + sqsize + "px\"></div>\n";	
+	result += "<div id=\""+this.tableid+"_0\" style=\"position:absolute;left:"+(6*this.sqsize)+";top:"+this.sqsize+";background-color:"+this.lightcolor+"\" onmousedown=\"SetupTable.Mousedown(event,this);\" ><img src=\""+piecegraphics[0]+"\" style = \"width: " + sqsize + "px\" ></div>\n";	
 
-	result += "<div id=\""+this.tableid+"_empty\" style=\"position:absolute;left:"+(7*this.sqsize+this.sqsize/4)+";top:0;\" onmousedown=\"SetupTable.Mousedown(event,this);\" ><img src=\""+emptyboardgraphics+"\" ></div>\n";	
+	result += "<div id=\""+this.tableid+"_empty\" style=\"position:absolute;left:"+(7*this.sqsize+this.sqsize/4)+";top:0;\" onmousedown=\"SetupTable.Mousedown(event,this);\" ><img src=\""+emptyboardgraphics+"\" style = \"width: " + sqsize + "px\" ></div>\n";	
 
 
 
@@ -1808,7 +1813,7 @@ function MG_IAS(p, s, W) {
 		b.allowfreemoving = true;
 		p.AddListener(b);
 		b.SetRefPosition(p);
-		et = new EndgameTable(800,60,558,"en",p);
+		et = new EndgameTable(600,60,358,"en",p);
         b.setEndgameTable(et);
 		p.AddListener(et);
 		et.SetVisible(true);
@@ -1816,7 +1821,7 @@ function MG_IAS(p, s, W) {
 		em = new EndgameManager();
 		p.AddListener(em);
 
-		st = new SetupTable(0,758,'de',p);
+		st = new SetupTable(0,558,'de',p);
 		st.SetVisible(true);
 		st.inputboard = b;
 		b.setuptable = st;
@@ -1829,7 +1834,7 @@ function MG_IAS(p, s, W) {
 		
 		var d = document.createElement("div");
 		d.style.position = 'absolute';
-		d.style.left = 800;
+		d.style.left = 600;
 		d.style.top = 10;
 		d.style.height = 30;
 		d.style.width = 250;
