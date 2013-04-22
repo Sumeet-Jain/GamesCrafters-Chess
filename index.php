@@ -81,18 +81,18 @@ enmouse(false);
 <body onload="javascript:setTimeout('buildIt()',5);" onkeyup="keypress(event);">
 
 <!-- Canvas for arrows -->
-<canvas id="canvas" width="300" height="300" style = "position: absolute; align: left; z-index: 5; pointer-events: none"></canvas>
+<canvas id="canvas" width="500" height="500"  style = "position: absolute; top: 10; left: 0; z-index: 5; pointer-events: none"></canvas>
 
-<div class="info" style="position:absolute; left:0; top:530;" >FEN:</div>
-<div id="info" class="info" onmouseover="enmouse(true);" onmouseout="enmouse(false);" style="position:absolute; left:30; top:530;" ></input></div>
+<div class="info" style="position:absolute; left:0; top:730;" >FEN:</div>
+<div id="info" class="info" onmouseover="enmouse(true);" onmouseout="enmouse(false);" style="position:absolute; left:30; top:730;" ></input></div>
 
 
 <!-- CREATING THE BUTTONS-->
-<div class="button" style="position:absolute; left:600; top:558;" onmouseover="over(this);" onmouseout="leave(this);" onclick="flip();" >Flip Board</div>
+<div class="button" style="position:absolute; left:800; top:558;" onmouseover="over(this);" onmouseout="leave(this);" onclick="flip();" >Flip Board</div>
 
-<div class="button" style="position:absolute; left:600; top:585;" onmouseover="over(this);" onmouseout="leave(this);" onclick="inputfen();" >Input FEN</div>
+<div class="button" style="position:absolute; left:800; top:585;" onmouseover="over(this);" onmouseout="leave(this);" onclick="inputfen();" >Input FEN</div>
 
-<div class="button" style="position:absolute; left:600; top:612;" onmouseover="over(this);" onmouseout="leave(this);" onclick="takeback();" >Back</div>
+<div class="button" style="position:absolute; left:800; top:612;" onmouseover="over(this);" onmouseout="leave(this);" onclick="takeback();" >Back</div>
 
 </body>
 

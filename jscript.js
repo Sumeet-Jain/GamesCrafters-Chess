@@ -1,19 +1,22 @@
 /*TODO
- * 1) Resize piece files
- * 2) Mabye redo some of the layout stuff. If we have time, make each position of the div tags a function of sqsize. 
- * 3) ******ARROWS BY SATURDAY********
- *      a). Need two functions, one that creates nd draws arrows, the other that erases them.
- *      b). main thing we need done.
- * 4) A bug in the server call. The url this guy uses has two fen string variables in the xml get. Sometimes, the server call
+ * 4) BUG: We messed up for checks. Our function only draws it for complete lines of moves. 
+ * 4) A bug in the server call. The url this guy uses has two fen string variables in the xml get. Sometimes, the server call returns errors. Causes funky bugs.
  *      returns with a error for white, and a list of moves for black. I think the two fen string variables cause this error. 
  *      Only happens some of the times though; 
  * 5) Another bug: When clicking a empty square when having the drag 
  *      piece on, it uncolors the whole board.
- * 6) With drag piece, if the mouse is on the edge of two squares when
- *      clicking, it doesnt color squares properly.
+ * 6) When clicking fast, it fucks up. I think its a cache problem. Or the server call.
+ * 7) Bishops dont work. I dont know why. Has to do with server call
+ * 8) Arrows line up in certain scenarios. Its with downright and upleft. They collide.
 */
 
-var sqsize = 61;function responseHandler0() { reqcollection[0].HandleResponse(); }
+/*
+ * TODO 
+ * Make all resizing in terms of sqsize.
+ * Fix above bugs.
+ */
+
+var sqsize = 81;function responseHandler0() { reqcollection[0].HandleResponse(); }
 function responseHandler1() { reqcollection[1].HandleResponse(); }
 function responseHandler2() { reqcollection[2].HandleResponse(); }
 function responseHandler3() { reqcollection[3].HandleResponse(); }
@@ -736,6 +739,7 @@ function Board_Mouseover(ev,ob) {
                 o.UnmarkSquare(i);
             }
         }
+        o.MarkSquare(sq);
             
         for(var i = 0; i < moveList.length; i++){
             if(moveList[i][POSRESULT] == "Draw"){
@@ -744,6 +748,7 @@ function Board_Mouseover(ev,ob) {
                 var to = TO;
             }
            o.MarkSquare(moveList[i][to], moveList[i], o.endgametable.coloring, o.endgametable.minWin, o.endgametable.maxLose);
+           o.endgametable.eraseArrows();
         }
     }       
 }
@@ -775,6 +780,7 @@ function Board_Mouseout(ev,ob) {
             }
            o.UnmarkSquare(moveList[i][to]);
         }
+       o.endgametable.drawAllArrows();
     }       
 }
 Board.Mouseout = Board_Mouseout;
@@ -958,6 +964,8 @@ function Board_Flip() {
 	document.getElementById(this.boardid+"_lettersbottominv").style.visibility = this.whiteonbottom ? 'hidden' : 'visible';
 	document.getElementById(this.boardid+"_numbersright").style.visibility = this.whiteonbottom ? 'visible' : 'hidden';
 	document.getElementById(this.boardid+"_numbersrightinv").style.visibility = this.whiteonbottom ? 'hidden' : 'visible';
+    this.endgametable.eraseArrows();
+    this.endgametable.drawAllArrows();
 }
 Board.prototype.Flip = Board_Flip;
 
@@ -1093,11 +1101,13 @@ function EndgameTable_SetObserver(board) {
 EndgameTable.prototype.SetObserver = EndgameTable_SetObserver;
 
 function EndgameTable_SetData(moves) {
+    this.eraseArrows();
     this.observer.UnmarkAll();
     this.sqVVH = new Array(64);
 
 	if (moves.length == 0 && this.posval.length == 0) {
 		this.ShowNoInfoAvailable();
+        this.eraseArrows();
 		return;
 	}
 
@@ -1145,7 +1155,7 @@ function EndgameTable_SetData(moves) {
                 winTxt.push(t);
                 this.sqVVH[f].push(winTxt);
                 this.observer.ColorSquare(f, winTxt, this.minWin, 
-                        this.maxLose);
+                       this.maxLose);
             } else {
                 winTxt.push(t);
                 this.sqVVH[f].push(winTxt);
@@ -1172,6 +1182,7 @@ function EndgameTable_SetData(moves) {
 		document.getElementById(this.tableid+'_value').innerHTML = this.posval[0];
 	else if (this.posval.length == 2 && !this.position.wtm) 
 		document.getElementById(this.tableid+'_value').innerHTML = this.posval[1];
+    this.drawAllArrows();
 }
 
 EndgameTable.prototype.SetData = EndgameTable_SetData;
@@ -1180,6 +1191,9 @@ function EndgameTable_RequestData(pos) {
 	document.getElementById(this.tableid+'_body').innerHTML = "";
 	document.getElementById(this.tableid+'_value').innerHTML = "";
 	var n = pos.NumberOfPieces();
+    //Resetting all my previous stuff
+    this.sqVVH = new Array(64);
+    this.eraseArrows();
 	var valid = pos.IsValid(true);
 	if (!valid) {
 		pos.wtm ^= true;
@@ -1211,7 +1225,6 @@ function EndgameTable_RequestData(pos) {
 	}
 	else {
         this.ShowNoInfoAvailable();
-        this.sqVVH = new Array(64);
         this.observer.UnmarkAll();
     }
 }
@@ -1306,6 +1319,7 @@ function EndgameTable_Endingover(ev, ob) {
     
         // Uncolors all existing squares with default VVH colors
         if(tab.coloring){
+            tab.eraseArrows();
             for(var i = 0; i < tab.sqVVH.length; i++){
                 if(tab.sqVVH[i] != undefined && i != tab.movefrom[row]){
                     board.UnmarkSquare(i);
@@ -1330,6 +1344,7 @@ function EndgameTable_Endingout(ev, ob) {
         } else {
             tab.observer.UnmarkSquare(tab.movefrom[row], tab.sqVVH[tab.movefrom[row]][0], tab.coloring, tab.minWin, tab.maxLose); 
         }
+
 		tab.observer.UnmarkSquare(tab.moveto[row]);
 
         //Recolor all other squares
@@ -1339,6 +1354,7 @@ function EndgameTable_Endingout(ev, ob) {
                     tab.observer.ColorSquare(i, tab.sqVVH[i][0], tab.minWin, tab.maxLose);
                 }
             }
+            tab.drawAllArrows();
         }
 
 	}
@@ -1360,6 +1376,7 @@ EndgameTable.Endingdown = EndgameTable_Endingdown;
 function EndgameTable_PositionChanged(pos) {
     this.observer.UnmarkAll();
     this.sqVVH = new Array(64);
+    this.eraseArrows();
 	this.RequestData(pos);
 }
 
@@ -1813,7 +1830,7 @@ function MG_IAS(p, s, W) {
 		b.allowfreemoving = true;
 		p.AddListener(b);
 		b.SetRefPosition(p);
-		et = new EndgameTable(600,60,358,"en",p);
+		et = new EndgameTable(800,60,358,"en",p);
         b.setEndgameTable(et);
 		p.AddListener(et);
 		et.SetVisible(true);
@@ -1821,7 +1838,7 @@ function MG_IAS(p, s, W) {
 		em = new EndgameManager();
 		p.AddListener(em);
 
-		st = new SetupTable(0,558,'de',p);
+		st = new SetupTable(0,758,'de',p);
 		st.SetVisible(true);
 		st.inputboard = b;
 		b.setuptable = st;
@@ -1834,7 +1851,7 @@ function MG_IAS(p, s, W) {
 		
 		var d = document.createElement("div");
 		d.style.position = 'absolute';
-		d.style.left = 600;
+		d.style.left = 800;
 		d.style.top = 10;
 		d.style.height = 30;
 		d.style.width = 250;
@@ -2042,3 +2059,242 @@ function Board_IterThroughSqVVH(currSq, nextSq){
 }
 
 Board.prototype.IterThroughSqVVH = Board_IterThroughSqVVH;
+
+/*
+ * takes in a square id that is from 0 - 63 and returns the x,y coords
+ * of said square. The top corner, or square 56, is [0,0], and the bottom right 
+ * corner is 7,7
+ * Returns an array of [x,y]
+ */
+function Board_getCoordsOf(squareid){
+    if(this.whiteonbottom){
+        var row = 7 - (squareid / 8 >> 0);
+        var col = squareid % 8;
+        return [col, row];
+    } else { //If flipped
+        var row = (squareid / 8 >> 0);
+        var col = 7 - (squareid % 8);
+        return [col, row];
+    }
+
+}
+
+Board.prototype.getCoordsOf = Board_getCoordsOf;
+
+/*
+ * Function to determine direction from one square to another.
+ * @params from the starting square. to is the ending square.
+ * @return string of the direction 'from' from to 'to'
+ * The string is either up, down, left right, or a combo of {up, down} + {left, right}
+ */
+function Board_getDirection(from, to){
+    var fromCoord = this.getCoordsOf(from);
+    var toCoord = this.getCoordsOf(to);
+    if(fromCoord[0] == toCoord[0]){
+        if(fromCoord[1] > toCoord[1]){
+            return "up";
+        } else { 
+            return "down";
+        }
+    } else if (fromCoord[1] == toCoord[1]){
+        if(fromCoord[0] > toCoord[0]){
+            return "left";
+        } else {
+            return "right";
+        }
+    } else if(fromCoord[0] > toCoord[0]){
+        if(fromCoord[1] > toCoord[1]){
+            return "upleft";
+        } else{
+            return "downleft";
+        }
+    } else if(fromCoord[0] < toCoord[0]){
+        if(fromCoord[1] > toCoord[1]){
+            return "upright";
+        } else{
+            return "downright";
+        }
+    }
+}
+
+Board.prototype.getDirection = Board_getDirection;
+
+
+/*
+ * Returns the coordinates of the topleft of the desired square
+ */
+function Board_getTopLeft(square){
+    var coords = this.getCoordsOf(square);
+    var x = coords[0] * (sqsize + 1);
+    var y = coords[1] * (sqsize + 1);
+    return [x,y];
+}
+
+Board.prototype.getTopLeft = Board_getTopLeft;
+
+/* Helper function for arrow. 
+ * Given the certain direction string from the set {up, down, left, right, upleft, upright, downleft, downright},
+ * Returns the offset of that string in an array of [x,y], in which x is the offset for x coord and y is the offset in y coord.
+ *
+ * The offset represents the following chart:
+ * | DL   L  UL|
+ * |           |
+ * | D        U|
+ * |           |
+ * |_DR___R__UR|
+ *
+ */
+function offSetArrow(string){
+    var div = 6;
+    var x, y;
+    if(string == "up"){
+        x = (div - 1) * (sqsize / div);
+        y = sqsize / 2; 
+    } else if (string == "down"){
+        x = sqsize / div;
+        y = sqsize / 2; 
+    } else if(string == "left"){
+        x = sqsize / 2;
+        y = sqsize / div; 
+    } else if(string == "right"){
+        x = sqsize / 2;
+        y = (div - 1) * sqsize / div; 
+    } else if (string == "upright"){
+        x = (div - 2) * sqsize / div;
+        y = (div - 2) * sqsize / div;
+    } else if (string == "upleft"){
+        x = (div - 2) * sqsize / div;
+        y = sqsize / div;
+    } else if (string == "downleft"){
+        x = sqsize / div;
+        y = 2 * sqsize / div;
+    } else if(string == "downright"){
+        x = sqsize / div;
+        y = (div - 2) * sqsize / div;
+    }
+    return [x,y];
+}
+
+
+//Draws an arrow from start to end of specficied color
+function EndgameTable_drawArrow(start, end, color){
+    var board = this.observer;
+    var st = board.getTopLeft(start);
+    var e = board.getTopLeft(end);
+    var direction = board.getDirection(start, end);
+    var offset = offSetArrow(direction);
+
+    st[0] += offset[0];
+    e[0] += offset[0];
+    st[1] += offset[1];
+    e[1] += offset[1];
+    var ctx = document.getElementById("canvas").getContext('2d');
+    canvas_arrow(ctx, st[0], st[1], e[0], e[1], color);
+}
+
+EndgameTable.prototype.drawArrow = EndgameTable_drawArrow;
+
+//Arrow drawer function. Takes in a context and coordinates and color to draw specified arrow.
+function canvas_arrow(context, fromx, fromy, tox, toy, color){
+    var headlen = 10;   // length of head in pixels
+    var angle = Math.atan2(toy-fromy,tox-fromx);
+    context.beginPath();
+    context.moveTo(fromx, fromy);
+    context.lineTo(tox, toy);
+    context.moveTo(tox, toy);
+    //context.arc(tox, toy, 3, 0, 2 * Math.PI, false);
+    //context.fillStyle = color;
+    //context.fill();
+    context.lineTo(tox-headlen*Math.cos(angle-Math.PI/6),toy-headlen*Math.sin(angle-Math.PI/6));
+    context.moveTo(tox, toy);
+    context.lineTo(tox-headlen*Math.cos(angle+Math.PI/6),toy-headlen*Math.sin(angle+Math.PI/6));
+    context.lineWidth = 3;
+    context.strokeStyle = color;
+    context.lineCap = 'round';
+    context.stroke();
+}
+
+/*
+ * Function that determines the previous square in the direction from start to end.
+ * Takes in a starting and ending square, in terms of square id, 
+ * Returns the square id of the previous square that is traveled when going from start to end.
+ */
+function Board_prevSquare(start, end){
+    var to = this.getCoordsOf(end);
+    var string = this.getDirection(start, end);
+    var x, y;
+    if(string == "up"){
+        x = 0;
+        y = 1; 
+    } else if (string == "down"){
+        x = 0;
+        y = -1; 
+    } else if(string == "left"){
+        x = 1;
+        y = 0; 
+    } else if(string == "right"){
+        x = -1;
+        y = 0; 
+    } else if (string == "upright"){
+        x = -1;
+        y = 1;
+    } else if (string == "upleft"){
+        x = 1;
+        y = 1;
+    } else if (string == "downleft"){
+        x = 1;
+        y = -1;
+    } else if(string == "downright"){
+        x = -1;
+        y = -1; 
+    }
+    //Returns the square id of prev square
+    if(this.whiteonbottom){ 
+        return (7-(to[1] + y)) * 8 + (to[0] + x);
+    } else {
+        var yWeight = (to[1] + y) * 8;
+        var xWeight = -(to[0] + x) +  7;
+        return yWeight + xWeight;
+    }
+
+}
+
+Board.prototype.prevSquare = Board_prevSquare;
+
+/*
+ * Draws all arrows onto the canvas based on the current sqVVH values.
+ */
+function EndgameTable_drawAllArrows(){
+    var board = this.observer;
+    if(this.coloring === false){
+        return;
+    }
+    for(var i = 0; i < this.sqVVH.length; i++){
+        if(this.sqVVH[i] != undefined){
+            var moves = this.sqVVH[i];
+            for(var j = 0; j < moves.length; j++){
+                var color = getColor(moves[j], this.minWin, this.maxLose);
+                var prevId = board.prevSquare(i, moves[j][moves[j].length - 1]);
+                if(board.currentpieces[i] == 5 || this.observer.currentpieces[i] == 11){ //If knight
+                    this.drawArrow(i, moves[j][moves[j].length - 1], color);
+                } else {
+                    this.drawArrow(prevId, moves[j][moves[j].length - 1], color);
+                }
+            }
+        }
+    }
+}
+
+EndgameTable.prototype.drawAllArrows = EndgameTable_drawAllArrows;
+
+/*
+ * Erases all arrows.
+ */
+EndgameTable.prototype.eraseArrows = function(){
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext('2d');
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+};
