@@ -1,4 +1,4 @@
-/*TODO
+/** Known bug list
  * 4) BUG: We messed up for checks. Our function only draws it for complete lines of moves. 
  * 4) A bug in the server call. The url this guy uses has two fen string variables in the xml get. Sometimes, the server call returns errors. Causes funky bugs.
  *      returns with a error for white, and a list of moves for black. I think the two fen string variables cause this error. 
@@ -10,10 +10,16 @@
  * 8) Arrows line up in certain scenarios. Its with downright and upleft. They collide.
 */
 
-/*
- * TODO 
+/** TODO 
  * Make all resizing in terms of sqsize.
  * Fix above bugs.
+ */
+
+/**
+ * FIXME || Extraneous thingd
+ * Arrow heads are drawn atop one another.
+ * Make picture of pieces on top of arrows.
+ * Maybe put an outline on arrows;
  */
 
 var sqsize = 81;function responseHandler0() { reqcollection[0].HandleResponse(); }
@@ -502,8 +508,10 @@ function Position_GetMoveString(move) {
 
 function Board(sqsize, darkcolor, lightcolor, posx, posy) {
 	this.sqsize = sqsize;
-	this.darkcolor = darkcolor;
-	this.lightcolor = lightcolor;
+	//this.darkcolor = darkcolor;
+	//this.lightcolor = lightcolor;
+    this.darkcolor = "rgba(120,120,120,1)";
+    this.lightcolor = "rgba(128, 128, 128, 1)";
 	this.posx = posx;
 	this.posy = posy;
 	this.currentpieces = new Array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
@@ -609,11 +617,11 @@ Board.Mousedownmoveind = Board_Mousedownmoveind;
 function Board_Mousedown(ev, ob) {
 	var o = Objectmap.Get(ob.id.split('_')[0]);
 	
-	o.UnmarkAll();
 	if (!o.inputenabled||o.position==null) { return;}
 	if (o.liftedpiece != 0)  { return;}
 
 	var sq = eval(ob.id.split('_')[1]);
+
 
 	if (o.setuptable != null && o.setuptable.IsSetupMode()) {
 		var old = o.position.b[sq];
@@ -1948,42 +1956,55 @@ function takeback() {
     }
 }
 
-//Colors 
+/**
+ * Colors certain square based on input values.
+ * @param sq the square to be colored.
+ *        winTxt an array of the move, which determines the color.
+ *        minWin an array of the 4 best win in blank moves. Contain ints of the win values.
+ *        maxLose an array of the 4 best lose in blank moves. Contain ints of the lose values.
+ */
 function Board_ColorSquare(sq,winTxt, minWin, maxLose){
     document.getElementById(this.boardid+"_"+sq).style.background = getColor(winTxt,minWin,maxLose);
-
-    /*
-    for(var i = 0; i < 64; i++){
-        document.getElementById(this.boardid+"_"+i).style.border = 
-            "thin solid rgb(207,211,222)" ;
-            //"thin solid rgb(181,189,206)";
-            //"thin solid rgb(233,236,240)" ;
-    }
-    */
 }
 
 Board.prototype.ColorSquare = Board_ColorSquare;
 
 //Color constants that are missing opacities.
-var RED = 'rgba(139,0,0,';//Red 4
-var YELLOW = 'rgb(255,255,0)';
-var GREEN = 'rgba(0,127,0,';
-var RGB = 'rgb(';
+var RED = 'rgba(139,0,0,',
+    YELLOW = 'rgb(255,255,0)',
+    GREEN = 'rgba(0,127,0,',
+    RGB = 'rgb(';
 
-//ABSTRACTION for wintxt
-var INMOVES = 3;
-var POSRESULT = 1;
-var TO = 4;
-var TODRAW = 2;
+/**
+ * The following are abstractions for win text. 
+ * winTxt is an array of winlosedraw in blank moves.
+ * It stored in the following format:
+ *      [ ,Win or Lose or Draw as a string, "in", the number of moves, to square as the square id number]
+ *      It doesnt have in number of moves if POSRESULT is a draw.
+ */
+var INMOVES = 3,
+    POSRESULT = 1,
+    TO = 4,
+    TODRAW = 2;
 
-//Takes in a String whose value should either be Win, Draw, or Lose
-//Returns the RED, YELLOW, GREEN constants
+/**
+ * Returns the color for a certain move. 
+ * @param winTxt the winTxt array for certain move.
+ *        minWin the array of the 4 best moves.
+ *        maxLose the arrow of the 4 best losing moves.
+ * @return returns the rgba value for said move.
+ *
+ * THIS IS NOT THE GC STANDARD COLORING SYSTEM. LOOKS BETTER ON BLUE/WHITE BOARD,
+ * BUT NOT ON THE GRAY BOARD
+ */
+/*
 function getColor(winTxt, minWin, maxLose){
-    var winLoseDraw = winTxt[POSRESULT];
+    var winLoseDraw = winTxt[POSRESULT],
+        i;
     if(winLoseDraw == "Win"){
-        for(var i = 0; i < 4; i++){
+        for(i = 0; i < 4; i++){
             if(winTxt[INMOVES] == minWin[i]){
-                return GREEN +   getOpacity(i, "Win");
+                return GREEN + getOpacity(i, "Win");
             }
         }
         return GREEN + getOpacity(3);
@@ -1992,7 +2013,7 @@ function getColor(winTxt, minWin, maxLose){
         return YELLOW;
     }
     else {
-        for(var i = 0; i < 4; i++){
+        for(i = 0; i < 4; i++){
             if(winTxt[INMOVES] == maxLose[i]) {
                 return RED +  getOpacity(i, "Lose");
             }
@@ -2000,50 +2021,77 @@ function getColor(winTxt, minWin, maxLose){
         return RED +  getOpacity(3, "Lose");
     }
 }
+*/
 
-//Helper function for get color. Get color returns the opacity class, which
-//is a number from one to four. 
-/*
-function getOpacity(num, winLose){
+/**
+ * Returns the color for a certain move. 
+ * @param winTxt the winTxt array for certain move.
+ *        minWin the array of the 4 best moves.
+ *        maxLose the arrow of the 4 best losing moves.
+ * @return returns the rgba value for said move.Gamescrafters standard colors;
+ *
+ * LOOKS BETTER ON GRAYSCALE BOARD
+ */
+function getColor(winTxt, minWin, maxLose){
+    var winLose = winTxt[POSRESULT];
     if(winLose == "Win"){
-        if(num == 1){
+        if(minWin[0] == winTxt[INMOVES]){
             return RGB + "0,127,0)";
-        }else if (num == 2){
+        } else if (minWin[1] == winTxt[INMOVES]){
             return RGB + "63,127,63)"; 
-        } else if (num == 3){
+        } else if (minWin[2] == winTxt[INMOVES]){
             return RGB + "95,127,95)";
         } else {
             return RGB + "114,127,114)";
         }
+    } else if (winLose == "Draw") {
+        return YELLOW;
     } else {
-        if(num == 1){
+        if(winTxt[INMOVES] == maxLose[0]){
             return RGB + "139,0,0)";
-        } else if (num == 2){
+        } else if (winTxt[INMOVES] == maxLose[1]){
             return RGB + '133,63,63)';
-        } else if (num == 3) {
+        } else if (winTxt[INMOVES] == maxLose[2]) {
             return RGB +  '130,95,95)';
         } else {
             return RGB + '128,114,114)';
         }
     }
 }
-*/
 
+/**
+ * Returns the opacity and finishes the rgba text value.
+ *
+ * @param i is the rank of the opacity from 0 - 3. The lower the value, 
+ *           the less transparent the value will be.
+ * @return the opacity value and and parens. Eg, .5)
+ * 
+ * THIS LOOKS BETTER ON BLUE?HITE BOARD, but not on the gamescrafter standardized coloring system.
+ */
+/*
 function getOpacity(i){
     var txt;
     if(i == 0){
         txt = 1;
     } else if(i == 1) {
-        txt =  .75;
+        txt =  .5;
     } else if(i == 2) {
-        txt = .50;
-    }  else { 
         txt = .25;
+    }  else { 
+        txt = .1;
     }
     txt += ')' ;
     return txt;
 }
+*/
 
+/*
+ * Function iterates through the move list for the current square. If the 
+ * nextSq is in the currentSquares move list, it marks that square.
+ *
+ * @param currSq the square whose move list you are investigating.
+ *        nextSquare the square which you are seeing if it is in the moveList;
+ */
 function Board_IterThroughSqVVH(currSq, nextSq){
     var moveList = this.endgametable.sqVVH[currSq];
     if(moveList == undefined){
@@ -2081,7 +2129,7 @@ function Board_getCoordsOf(squareid){
 
 Board.prototype.getCoordsOf = Board_getCoordsOf;
 
-/*
+/**
  * Function to determine direction from one square to another.
  * @params from the starting square. to is the ending square.
  * @return string of the direction 'from' from to 'to'
@@ -2120,8 +2168,10 @@ function Board_getDirection(from, to){
 Board.prototype.getDirection = Board_getDirection;
 
 
-/*
+/**
  * Returns the coordinates of the topleft of the desired square
+ * @param square the square whose topleft corner you want.
+ * @return an array of the coordinates (x,y) of the top left corner of input
  */
 function Board_getTopLeft(square){
     var coords = this.getCoordsOf(square);
@@ -2132,16 +2182,17 @@ function Board_getTopLeft(square){
 
 Board.prototype.getTopLeft = Board_getTopLeft;
 
-/* Helper function for arrow. 
+/**
+ * Helper function for arrow. 
  * Given the certain direction string from the set {up, down, left, right, upleft, upright, downleft, downright},
  * Returns the offset of that string in an array of [x,y], in which x is the offset for x coord and y is the offset in y coord.
  *
  * The offset represents the following chart:
- * | DL   L  UL|
+ * | DL  L   UL|
  * |           |
  * | D        U|
  * |           |
- * |_DR___R__UR|
+ * |_DR__R___UR|
  *
  */
 function offSetArrow(string){
@@ -2208,7 +2259,7 @@ function canvas_arrow(context, fromx, fromy, tox, toy, color){
     context.lineTo(tox-headlen*Math.cos(angle-Math.PI/6),toy-headlen*Math.sin(angle-Math.PI/6));
     context.moveTo(tox, toy);
     context.lineTo(tox-headlen*Math.cos(angle+Math.PI/6),toy-headlen*Math.sin(angle+Math.PI/6));
-    context.lineWidth = 3;
+    context.lineWidth = 10;
     context.strokeStyle = color;
     context.lineCap = 'round';
     context.stroke();
