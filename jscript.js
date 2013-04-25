@@ -1,13 +1,12 @@
 /** Known bug list
- * 4) BUG: We messed up for checks. Our function only draws it for complete lines of moves. 
- * 4) A bug in the server call. The url this guy uses has two fen string variables in the xml get. Sometimes, the server call returns errors. Causes funky bugs.
+ * 4) BUG: We messed up for positions in check. Our function only draws it for complete lines of moves. 
+ * 5) A bug in the server call. The url this guy uses has two fen string variables in the xml get. Sometimes, the server call returns errors. Causes funky bugs.
  *      returns with a error for white, and a list of moves for black. I think the two fen string variables cause this error. 
  *      Only happens some of the times though; 
  * 5) Another bug: When clicking a empty square when having the drag 
- *      piece on, it uncolors the whole board.
- * 6) When clicking fast, it fucks up. I think its a cache problem. Or the server call.
+ *      piece on, it uncolors the whole board. I think i fixed it.
+ * 6) When clicking fast, it fucks up. I think its a cache problem. Or the server call
  * 7) Bishops dont work. I dont know why. Has to do with server call
- * 8) Arrows line up in certain scenarios. Its with downright and upleft. They collide.
 */
 
 /** TODO 
@@ -16,10 +15,10 @@
  */
 
 /**
- * FIXME || Extraneous thingd
- * Arrow heads are drawn atop one another.
+ * FIXME || Extraneous things
  * Make picture of pieces on top of arrows.
  * Maybe put an outline on arrows;
+ * Arrows on gray board look ugly and they are hard to see.
  */
 
 var sqsize = 81;function responseHandler0() { reqcollection[0].HandleResponse(); }
@@ -525,6 +524,11 @@ function Board(sqsize, darkcolor, lightcolor, posx, posy) {
 	this.hasmarked = _f;
 	this.setuptable = null;
 	this.allowfreemoving = false;
+
+    /**
+     * Gamescrafters added variables. endgametable is a reference to the endgametable object.
+     * Bordercolor is the color of the borders. 
+     */
     this.endgametable; 
 	this.bordercolor = 'rgb(207,213,223)';
 	var d = this.GetDivElement();	
@@ -1052,11 +1056,25 @@ function EndgameTable(posx, posy, tabheight, lang, position) {
 	document.getElementsByTagName("body")[0].appendChild(d);
 	this.SetHeaderTable(lang);
 
-    //VVH Variables
+    /**
+     * Gamecrafsters added variable
+     * @var coloring enables or disables all the features that we have added, ie the coloring and arrows of squares.
+     * @var winLose an array that stores the win in blank moves for the endgame table itself. Stores it by row.
+     * @var sqVVH an array that stores movelists corersponding to each square of the board. The index of the sqVVH
+     *          returns an array of all moves from that square in terms of winTxts. Eg, sqVVH[7] returns the possible
+     *          moves from 7 to other squares. If it does not have any moves, it will return void.
+     * @var minWin stores the four best winning moves. Used for delta remotenss. Stores the winTxts.
+     * @var maxLose stores the four best losing moves. Used for delta remoteness. Stores the winTxts
+     *
+     * @var winTxt common abstraction for Win/Lose/Draw in blank moves. It is an array in the form:
+     *          [,Win/Lose/, in, move number, square it is moving to]. If it is a draw, then
+     *          [,Draw,square it is moving to]. See the abstraction variables of winTxts at the bottoms of the document
+     *          for the abstraction constants. 
+     */
     this.coloring = true;
     this.winLose = new Array(); //Stores the win lose draw value for each row in the endgame table.
     this.sqVVH = new Array(64);  //Stores all winTxt for said square.
-    this.minWins = new Array(4);
+    this.minWin = new Array(4);
     this.maxLose = new Array(4);
 }
 
@@ -2108,7 +2126,7 @@ function Board_IterThroughSqVVH(currSq, nextSq){
 
 Board.prototype.IterThroughSqVVH = Board_IterThroughSqVVH;
 
-/*
+/**
  * takes in a square id that is from 0 - 63 and returns the x,y coords
  * of said square. The top corner, or square 56, is [0,0], and the bottom right 
  * corner is 7,7
@@ -2221,7 +2239,7 @@ function offSetArrow(string){
         y = 2 * sqsize / div;
     } else if(string == "downright"){
         x = sqsize / div;
-        y = (div - 2) * sqsize / div;
+        y = (div - 1) * sqsize / div;
     }
     return [x,y];
 }
@@ -2245,7 +2263,7 @@ function EndgameTable_drawArrow(start, end, color){
 
 EndgameTable.prototype.drawArrow = EndgameTable_drawArrow;
 
-//Arrow drawer function. Takes in a context and coordinates and color to draw specified arrow.
+//Arrow drawer function. Takes in a canvas context and coordinates and color to draw specified arrow.
 function canvas_arrow(context, fromx, fromy, tox, toy, color){
     var headlen = 10;   // length of head in pixels
     var angle = Math.atan2(toy-fromy,tox-fromx);
@@ -2265,7 +2283,7 @@ function canvas_arrow(context, fromx, fromy, tox, toy, color){
     context.stroke();
 }
 
-/*
+/**
  * Function that determines the previous square in the direction from start to end.
  * Takes in a starting and ending square, in terms of square id, 
  * Returns the square id of the previous square that is traveled when going from start to end.
