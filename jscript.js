@@ -1856,7 +1856,7 @@ function MG_IAS(p, s, W) {
 		b.allowfreemoving = true;
 		p.AddListener(b);
 		b.SetRefPosition(p);
-		et = new EndgameTable(800,60,358,"en",p);
+		et = new EndgameTable(sqsize * 10, 3 * sqsize / 4, 358,"en",p);
         b.setEndgameTable(et);
 		p.AddListener(et);
 		et.SetVisible(true);
@@ -1864,7 +1864,7 @@ function MG_IAS(p, s, W) {
 		em = new EndgameManager();
 		p.AddListener(em);
 
-		st = new SetupTable(0,758,'de',p);
+		st = new SetupTable(0,sqsize * 9.5,'de',p);
 		st.SetVisible(true);
 		st.inputboard = b;
 		b.setuptable = st;
@@ -1877,7 +1877,7 @@ function MG_IAS(p, s, W) {
 		
 		var d = document.createElement("div");
 		d.style.position = 'absolute';
-		d.style.left = 800;
+		d.style.left = sqsize * 10;
 		d.style.top = 10;
 		d.style.height = 30;
 		d.style.width = 250;
