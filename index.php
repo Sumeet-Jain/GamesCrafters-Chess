@@ -13,10 +13,7 @@
     font-family: verdana, arial, helvetica, sans-serif;
     text-align: center;
     vertical-align: middle;
-    font-size: 11px;
-    font-weight: bold;
-    color: #455D7F;
-    border: 1px solid #CCD2DC;
+    font-size: 11px; font-weight: bold; color: #455D7F; border: 1px solid #CCD2DC;
     background: #E7F1FF;
     cursor: pointer;
 }
@@ -79,20 +76,22 @@ enmouse(false);
 </head>
 
 <body onload="javascript:setTimeout('buildIt()',5);" onkeyup="keypress(event);">
-
 <!-- Canvas for arrows -->
 <canvas id="canvas" width="1000" height="1000"  style = "position: absolute; top: 10; left: 0; z-index: 5; pointer-events: none"></canvas>
 
-<div class="info" style="position:absolute; left:0; top:730;" >FEN:</div>
-<div id="info" class="info" onmouseover="enmouse(true);" onmouseout="enmouse(false);" style="position:absolute; left:30; top:730;" ></input></div>
+<canvas id="picvas" width="1000" height="1000"  style = "position: absolute; top: 10; left: 0; z-index: 6; pointer-events: none"></canvas>
+
+<div class="info" style="position:absolute; left:0; top:550;" >FEN:</div>
+<div id="info" class="info" onmouseover="enmouse(true);" onmouseout="enmouse(false);" style="position:absolute; left:30; top:550;" ></input></div>
 
 
 <!-- CREATING THE BUTTONS-->
-<div class="button" style="position:absolute; left:800; top:558;" onmouseover="over(this);" onmouseout="leave(this);" onclick="flip();" >Flip Board</div>
+<div class="button" style="position:absolute; left:650; top:618;" onmouseover="over(this);" onmouseout="leave(this);" onclick="flip();" >Flip Board</div>
 
-<div class="button" style="position:absolute; left:800; top:585;" onmouseover="over(this);" onmouseout="leave(this);" onclick="inputfen();" >Input FEN</div>
+<div class="button" style="position:absolute; left:650; top:645;" onmouseover="over(this);" onmouseout="leave(this);" onclick="inputfen();" >Input FEN</div>
 
-<div class="button" style="position:absolute; left:800; top:612;" onmouseover="over(this);" onmouseout="leave(this);" onclick="takeback();" >Back</div>
+<div class="button" style="position:absolute; left:650; top:672;" onmouseover="over(this);" onmouseout="leave(this);" onclick="takeback();" >Back</div>
+
 
 </body>
 

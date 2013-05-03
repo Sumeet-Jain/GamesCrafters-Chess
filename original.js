@@ -1,32 +1,4 @@
-/** Known bug list
- * 4) BUG: We messed up for positions in check. Our function only draws it for complete lines of moves. 
- * 5) A bug in the server call. The url this guy uses has two fen string variables in the xml get. Sometimes, the server call returns errors. Causes funky bugs.
- *      returns with a error for white, and a list of moves for black. I think the two fen string variables cause this error. EDIT NO IDEA WHY
- *      Only happens some of the times though; 
- * 5) Another bug: When clicking a empty square when having the drag 
- *      piece on, it uncolors the whole board. I think i fixed it.
- * 6) When clicking fast, it fucks up. I think its a cache problem. Or the server call
- * 7) Bishops dont work. I dont know why. Has to do with server call
-*/
-
-/** TODO 
- * Make all resizing in terms of sqsize. Partly done. Have to dothis in 
- *  things defined in index.
- * Fix above bugs.
- */
-
-/**
- * FIXME || Extraneous things
- * FIX THE SERVER CALL.
- * Make picture of pieces on top of arrows.
- * Maybe put an outline on arrows;
- * Arrows on gray board look ugly and they are hard to see.
- */
-
-//Note that changing the sqsize does not automatically change everything
-//Dependent on sqsize. You must change the things, ie buttons locations and fen string in index.html manually
-var sqsize = 65;
-function responseHandler0() { reqcollection[0].HandleResponse(); }
+var sqsize = 41;function responseHandler0() { reqcollection[0].HandleResponse(); }
 function responseHandler1() { reqcollection[1].HandleResponse(); }
 function responseHandler2() { reqcollection[2].HandleResponse(); }
 function responseHandler3() { reqcollection[3].HandleResponse(); }
@@ -55,7 +27,7 @@ function RequestObject(ownerid) {
 	this.ownerid = ownerid;
 	this.skipallbutlast = true;
 	this.http = createRequestObject();
-    this.script = "getServerResponse.php"
+	this.script = 'getServerResponse.php';
 	this.responsehandlername = "responseHandler"+reqcount;
 	reqcollection[reqcount] = this;
 	reqcount++;	
@@ -86,23 +58,23 @@ function RequestObject_HandleResponse() {
         var obid = null;
         var value = null;
         var data = response.split('|');
-        for (var i = 0; i < data.length; i++) {
-            if (data[i] == "hook") {
-                    hook = data[i+1];
-                    i++;
-                }
-                else if (data[i] == "reqid") {
-                    reqid = data[i+1];
-                    i++;
-                }
-                else if (data[i] == "value") {
-                    value = data[i+1];
-                    i++;
-                }
-                else if (data[i] == "obid") {
-                    obid = data[i+1];
-                    i++;
-                }
+				for (var i = 0; i < data.length; i++) {
+					if (data[i] == "hook") {
+						hook = data[i+1];
+						i++;
+					}
+					else if (data[i] == "reqid") {
+						reqid = data[i+1];
+						i++;
+					}
+					else if (data[i] == "value") {
+						value = data[i+1];
+						i++;
+					}
+					else if (data[i] == "obid") {
+						obid = data[i+1];
+						i++;
+					}
         }      
       if (obid != null) {
       	var theob = Objectmap.Get(obid);
@@ -125,12 +97,11 @@ function RequestObject_SendRequest(hook,action) {
 	if (this.queue.length == 0) {
 		try {
 			this.queue.push(u);
-            //console.log(u);
-            this.http.open("GET", u, true);
-            this.http.onreadystatechange = eval(this.responsehandlername);
-            this.http.send(null);
-        } catch (x) {alert(x);}
-      }
+	    this.http.open("GET", u, true);
+	    this.http.onreadystatechange = eval(this.responsehandlername);
+	    this.http.send(null);
+  	} catch (x) {alert(x);}
+  }
 	else {
 		this.queue.push(u);
 	}
@@ -157,9 +128,8 @@ function Objectmap() {}
 Objectmap.objectcount = 0;
 Objectmap.objectmap = new Array();
 
-function Objectmap_Add(baseid,ob,boo) {
-	var theid = baseid + '' + Objectmap.objectcount; 
-    theid = theid + Math.random();
+function Objectmap_Add(baseid,ob) {
+	var theid = baseid + '' + Objectmap.objectcount + Math.random();
 	Objectmap.objectmap[theid] = ob;
 	Objectmap.objectcount++;
 	return theid;
@@ -205,15 +175,14 @@ function scrollOffsetY() {
 		return document.body.scrollTop;
 	}
 }
-var picSize = 41;
-var piecegraphics = new Array("images/a"+picSize+"free.gif","images/a"+picSize+"wk.gif","images/a"+picSize+"wq.gif","images/a"+picSize+"wr.gif","images/a"+picSize+"wb.gif","images/a"+picSize+"wn.gif","images/a"+picSize+"wp.gif",
-"images/a"+picSize+"bk.gif","images/a"+picSize+"bq.gif","images/a"+picSize+"br.gif","images/a"+picSize+"bb.gif","images/a"+picSize+"bn.gif","images/a"+picSize+"bp.gif");
-var moveindicatorgraphics = new Array("images/a"+picSize+"mw0.gif","images/a"+picSize+"mw1.gif","images/a"+picSize+"mb0.gif","images/a"+picSize+"mb1.gif");
-var emptyboardgraphics = "images/a"+picSize+"empty.gif";
-var startboardgraphics = "images/a"+picSize+"start.gif";
-var promowgraphics = "images/a"+picSize+"promow.gif";
-var promobgraphics = "images/a"+picSize+"promob.gif";
-var movegraphics = "images/a"+picSize+"move.gif";
+var piecegraphics = new Array("images/a"+sqsize+"free.gif","images/a"+sqsize+"wk.gif","images/a"+sqsize+"wq.gif","images/a"+sqsize+"wr.gif","images/a"+sqsize+"wb.gif","images/a"+sqsize+"wn.gif","images/a"+sqsize+"wp.gif",
+"images/a"+sqsize+"bk.gif","images/a"+sqsize+"bq.gif","images/a"+sqsize+"br.gif","images/a"+sqsize+"bb.gif","images/a"+sqsize+"bn.gif","images/a"+sqsize+"bp.gif");
+var moveindicatorgraphics = new Array("images/a"+sqsize+"mw0.gif","images/a"+sqsize+"mw1.gif","images/a"+sqsize+"mb0.gif","images/a"+sqsize+"mb1.gif");
+var emptyboardgraphics = "images/a"+sqsize+"empty.gif";
+var startboardgraphics = "images/a"+sqsize+"start.gif";
+var promowgraphics = "images/a"+sqsize+"promow.gif";
+var promobgraphics = "images/a"+sqsize+"promob.gif";
+var movegraphics = "images/a"+sqsize+"move.gif";
 var _f=false, _t=true;
 
 
@@ -231,7 +200,7 @@ function Position() {
 	this.lastmove = 0;
 	this.makemovetext = false;
 	this.lastmovetext = null;
-    this.piececodes = new Array('','K','Q','R','B','N','','K','Q','R','B','N',''); 
+		this.piececodes = new Array('','K','Q','R','B','N','','K','Q','R','B','N',''); 
 	
 }
 
@@ -513,10 +482,8 @@ function Position_GetMoveString(move) {
 
 function Board(sqsize, darkcolor, lightcolor, posx, posy) {
 	this.sqsize = sqsize;
-	//this.darkcolor = darkcolor;
-	//this.lightcolor = lightcolor;
-    this.darkcolor = "rgb(123,123,123)";
-    this.lightcolor = "rgb(133, 133, 133)";
+	this.darkcolor = darkcolor;
+	this.lightcolor = lightcolor;
 	this.posx = posx;
 	this.posy = posy;
 	this.currentpieces = new Array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
@@ -530,12 +497,6 @@ function Board(sqsize, darkcolor, lightcolor, posx, posy) {
 	this.hasmarked = _f;
 	this.setuptable = null;
 	this.allowfreemoving = false;
-
-    /**
-     * Gamescrafters added variables. endgametable is a reference to the endgametable object.
-     * Bordercolor is the color of the borders. 
-     */
-    this.endgametable; 
 	this.bordercolor = 'rgb(207,213,223)';
 	var d = this.GetDivElement();	
 	document.getElementsByTagName("body")[0].appendChild(d);
@@ -557,12 +518,12 @@ function Board_GetDivElement() {
 		var to = (7-r) * this.sqsize;
 		var col = ((r % 2) == (f % 2)) ? this.darkcolor : this.lightcolor;
 		var sqid = this.boardid+"_"+i;
-		result += "<div id=\""+sqid+"\" style=\"position:absolute;left:"+le+";top:"+to+";width:"+this.sqsize+";height:"+this.sqsize+";background-color:"+col+";border:thin solid rgb(207,211,222); \" onmousedown=\"Board.Mousedown(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmousemove=\"Board.Mousemove(event,this);\"  onmouseover=\"Board.Mouseover(event,this);\" onmouseout=\"Board.Mouseout(event,this);\" ></div>\n";	
+		result += "<div id=\""+sqid+"\" style=\"position:absolute;left:"+le+";top:"+to+";width:"+this.sqsize+";height:"+this.sqsize+";background-color:"+col+";\" onmousedown=\"Board.Mousedown(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmousemove=\"Board.Mousemove(event,this);\" ></div>\n";	
 	}
-	result += "<div id=\""+this.boardid+"_dr\" style=\"position:absolute;left:"+0+";top:"+0+";visibility:hidden;\" onmousedown=\"Board.Mousedown(event,this);\" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\" onmouseout=\"Board.Mouseout(event,this);\" ><img style = \"width = '150%'\" src=\""+piecegraphics[0]+"\" style = \"width: " + sqsize + "px\" ></div>\n";	
-	result += '<div id="'+this.boardid+'_pro0" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\" onmouseout=\"Board.Mouseout(event,this);\" > </div>';
-	result += '<div id="'+this.boardid+'_pro1" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\" onmouseout=\"Board.Mouseout(event,this);\" > </div>';
-	result += '<div id="'+this.boardid+'_pro2" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\" onmouseover=\"Board.Mouseover(event,this);\" onmouseout=\"Board.Mouseout(event,this);\" > </div>';
+	result += "<div id=\""+this.boardid+"_dr\" style=\"position:absolute;left:"+0+";top:"+0+";visibility:hidden;\" onmousedown=\"Board.Mousedown(event,this);\" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\"><img src=\""+piecegraphics[0]+"\" ></div>\n";	
+	result += '<div id="'+this.boardid+'_pro0" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\"> </div>';
+	result += '<div id="'+this.boardid+'_pro1" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\"> </div>';
+	result += '<div id="'+this.boardid+'_pro2" style="position:absolute;left:0;top:0;width:'+this.sqsize+';height:'+this.sqsize+';visibility:hidden;" onmousemove=\"Board.Mousemove(event,this);\" onmouseup=\"Board.Mouseup(event,this);\"> </div>';
 
 	result += '<div id="'+this.boardid+'_miw" style="position:absolute;left:'+(this.sqsize*8+20)+';top:'+(this.sqsize*7)+';width:'+this.sqsize+';height:'+this.sqsize+';visibility:visible;" onmousedown=\"Board.Mousedownmoveind(event,this);\"><img src="'+moveindicatorgraphics[0]+'"></div>';
 	result += '<div id="'+this.boardid+'_mib" style="position:absolute;left:'+(this.sqsize*8+20)+';top:'+(0)+';width:'+this.sqsize+';height:'+this.sqsize+';visibility:visible;" onmousedown=\"Board.Mousedownmoveind(event,this);\"><img src="'+moveindicatorgraphics[2]+'"></div>';
@@ -597,11 +558,8 @@ Board.prototype.GetDivElement = Board_GetDivElement;
 
 function Board_SetPieceAt(s,p) {
 	if (this.currentpieces[s] == p) return;
-	//document.getElementById(this.boardid+"_"+s).innerhtml = "<img src=\""+piecegraphics[p]+"\" style = \"width: " + sqsize + "px\">" 
-    //document.getElementById(this.boardid+"_"+s).innerHTML = "<img src=\""+piecegraphics[p]+"\" style = \"width: " + sqsize + "px\" >";
+	document.getElementById(this.boardid+"_"+s).innerHTML = "<img src=\""+piecegraphics[p]+"\">";
 	this.currentpieces[s] = p;
-    this.endgametable.unStampBoard();
-    this.endgametable.stampBoard();
 }
 Board.prototype.SetPieceAt = Board_SetPieceAt;
 
@@ -629,11 +587,11 @@ Board.Mousedownmoveind = Board_Mousedownmoveind;
 function Board_Mousedown(ev, ob) {
 	var o = Objectmap.Get(ob.id.split('_')[0]);
 	
+	o.UnmarkAll();
 	if (!o.inputenabled||o.position==null) { return;}
 	if (o.liftedpiece != 0)  { return;}
 
 	var sq = eval(ob.id.split('_')[1]);
-
 
 	if (o.setuptable != null && o.setuptable.IsSetupMode()) {
 		var old = o.position.b[sq];
@@ -663,7 +621,7 @@ function Board_Mousedown(ev, ob) {
 	var promosq = new Array();
 	if (o.allowfreemoving==_f) {
 		for (var i = 0; i < set.length; i++) {
-			if ((set[i]&63) == sq) { o.MarkSquare(set[i]&63,o.endgametable.sqVVH[sq][0], o.endgametable.coloring); moveable = true; if(((set[i]>>12)&63)>0) promosq.push((set[i]>>6)&63);}
+			if ((set[i]&63) == sq) { o.MarkSquare((set[i]>>6)&63); moveable = true; if(((set[i]>>12)&63)>0) promosq.push((set[i]>>6)&63);}
 		}	
 	}
 	else {
@@ -671,14 +629,7 @@ function Board_Mousedown(ev, ob) {
 		if (sq <=15 && o.position.b[sq] == 12) {if (o.position.b[sq-8] == 0)promosq.push(sq-8); if (sq != 8 && o.position.b[sq-9] > 0 && o.position.b[sq-9] < 7) promosq.push(sq-9);if (sq != 15 && o.position.b[sq-7] > 0 && o.position.b[sq-7] < 7) promosq.push(sq-7); }
 		if (o.position.b[sq] > 0) moveable = true;
 		for (var i = 0; i < set.length; i++) {
-            var checking = ((set[i]>>6) & 63);
-			if ((set[i]&63) == sq) { 
-                if(!o.endgametable.coloring){
-                    o.MarkSquare(checking);
-                } else {
-                    o.IterThroughSqVVH(sq, checking);
-                }
-            }
+			if ((set[i]&63) == sq) { o.MarkSquare((set[i]>>6)&63);}
 		}	
 	}
 	if (promosq.length>0) {promosq.sort();for(var i=1;i<promosq.length;i++) if (promosq[i]==promosq[i-1]){promosq.splice(i,1);i--;}  }
@@ -692,9 +643,7 @@ function Board_Mousedown(ev, ob) {
 	var eldr = o.boardid+"_dr";
 
 	o.SetPieceAt(sq,0);
-
-	document.getElementById(eldr).innerHTML = "<img src=\""+piecegraphics[o.liftedpiece]+"\" style = \"width: " + sqsize + "px\">";
-
+	document.getElementById(eldr).innerHTML = "<img src=\""+piecegraphics[o.liftedpiece]+"\">";
  
  	var x = ev.clientX - document.getElementById(o.boardid).offsetLeft + scrollOffsetX();
 	var y = ev.clientY - document.getElementById(o.boardid).offsetTop + scrollOffsetY();
@@ -746,66 +695,7 @@ Board.Mousemove = Board_Mousemove;
 
 
 
-function Board_Mouseover(ev,ob) {
-    var o = Objectmap.Get(ob.id.split('_')[0]);
-    if(o.endgametable.coloring){
-        var sq = ob.id.split('_')[1];
-        var moveList = o.endgametable.sqVVH[sq]
-        if(moveList == undefined){
-            return;
-        }
 
-        for(var i = 0; i < o.endgametable.sqVVH.length; i++){
-            var sqList = o.endgametable.sqVVH;
-            if(sqList[i] != undefined){
-                o.UnmarkSquare(i);
-            }
-        }
-        o.MarkSquare(sq);
-            
-        for(var i = 0; i < moveList.length; i++){
-            if(moveList[i][POSRESULT] == "Draw"){
-                var to = TODRAW;
-            } else {
-                var to = TO;
-            }
-           o.MarkSquare(moveList[i][to], moveList[i], o.endgametable.coloring, o.endgametable.minWin, o.endgametable.maxLose);
-           o.endgametable.eraseArrows();
-        }
-    }       
-}
-Board.Mouseover = Board_Mouseover;
-
-
-function Board_Mouseout(ev,ob) {
-    var o = Objectmap.Get(ob.id.split('_')[0]);
-    if(o.endgametable.coloring){
-        var sq = ob.id.split('_')[1];
-        var moveList = o.endgametable.sqVVH[sq]
-        if(moveList == undefined || o.liftedpiece){
-            return;
-        }
-        
-        for(var i = 0; i < o.endgametable.sqVVH.length; i++){
-            if(o.endgametable.sqVVH[i] != undefined){
-                o.MarkSquare(i, o.endgametable.sqVVH[i][0],
-                        o.endgametable.coloring, o.endgametable.minWin,
-                        o.endgametable.maxLose);
-            }
-        }
-
-        for(var i = 0; i < moveList.length; i++){
-            if(moveList[i][POSRESULT] == "Draw"){
-                var to = TODRAW;
-            } else {
-                var to = TO;
-            }
-           o.UnmarkSquare(moveList[i][to]);
-        }
-       o.endgametable.drawAllArrows();
-    }       
-}
-Board.Mouseout = Board_Mouseout;
 
 
 
@@ -816,7 +706,7 @@ function Board_Mouseup(ev, ob) {
 	var o = Objectmap.Get(ob.id.split('_')[0]);
 	if (!o.inputenabled||o.position==null) return;
 	if (o.liftedpiece == 0) return;
-	//o.UnmarkAll();
+	o.UnmarkAll();
 
 	document.getElementById(o.boardid+"_dr").style.visibility = 'hidden';
 
@@ -832,14 +722,14 @@ function Board_Mouseup(ev, ob) {
 		if (o.liftedpiece > 6)promo += 6;
 	}
 
-    if (s == 'dr') {
-        var x = ev.clientX - document.getElementById(o.boardid).offsetLeft+scrollOffsetX();
-        var y = ev.clientY - document.getElementById(o.boardid).offsetTop+scrollOffsetY();
-        s = o.GetClicksquare(x,y);
-    }
-    s = eval(s);
+		if (s == 'dr') {
+			var x = ev.clientX - document.getElementById(o.boardid).offsetLeft+scrollOffsetX();
+			var y = ev.clientY - document.getElementById(o.boardid).offsetTop+scrollOffsetY();
+			s = o.GetClicksquare(x,y);
+		}
+		s = eval(s);
 
-    o.HidePromos();
+  o.HidePromos();
  	
  	if (o.allowfreemoving==_t) {
 		if (o.liftedfrom != s) {
@@ -914,36 +804,21 @@ function Board_SetVisible(b) {
 Board.prototype.SetVisible = Board_SetVisible;
 
 
-function Board_MarkSquare(sq, winTxt, coloring, minWin, maxLose) {
-    if(minWin == undefined){
-        minWin = this.endgametable.minWin;
-    } 
-    if (maxLose == undefined){
-        maxLose = this.endgametable.maxLose;
-    }
-    if(!coloring){
-        var f = sq & 7;
-        var r = sq >> 3;
-        var col = ((r % 2) == (f % 2)) ? "rgb(146,174,221)" : "rgb(198,221,255)";
-        document.getElementById(this.boardid+"_"+sq).style.background = col;
-    } else {
-        this.ColorSquare(sq, winTxt, minWin, maxLose);
-    }
-
+function Board_MarkSquare(sq) {
+	var f = sq & 7;
+	var r = sq >> 3;
+	var col = ((r % 2) == (f % 2)) ? "rgb(146,174,221)" : "rgb(198,221,255)";
+	document.getElementById(this.boardid+"_"+sq).style.background = col;
 	this.hasmarked = _t;
 }
 
 Board.prototype.MarkSquare = Board_MarkSquare;
 
-function Board_UnmarkSquare(sq, winTxt, coloring, minWin, maxLose) {
-    if(!coloring){
-        var f = sq & 7;
-        var r = sq >> 3;
-        var col = ((r % 2) == (f % 2)) ? this.darkcolor : this.lightcolor;
-        document.getElementById(this.boardid+"_"+sq).style.background = col;
-    } else {
-        this.ColorSquare(sq, winTxt, minWin, maxLose);
-    }
+function Board_UnmarkSquare(sq) {
+	var f = sq & 7;
+	var r = sq >> 3;
+	var col = ((r % 2) == (f % 2)) ? this.darkcolor : this.lightcolor;
+	document.getElementById(this.boardid+"_"+sq).style.background = col;
 }
 
 Board.prototype.UnmarkSquare = Board_UnmarkSquare;
@@ -961,8 +836,6 @@ function Board_PositionChanged(pos) {
 	for (var i = 0; i < 64; i++) {
 		this.UnmarkSquare(i);
 	}
-    this.endgametable.unStampBoard();
-    this.endgametable.stampBoard();
 }
 
 Board.prototype.PositionChanged = Board_PositionChanged;
@@ -988,10 +861,6 @@ function Board_Flip() {
 	document.getElementById(this.boardid+"_lettersbottominv").style.visibility = this.whiteonbottom ? 'hidden' : 'visible';
 	document.getElementById(this.boardid+"_numbersright").style.visibility = this.whiteonbottom ? 'visible' : 'hidden';
 	document.getElementById(this.boardid+"_numbersrightinv").style.visibility = this.whiteonbottom ? 'hidden' : 'visible';
-    this.endgametable.eraseArrows();
-    this.endgametable.drawAllArrows();
-    this.endgametable.unStampBoard();
-    this.endgametable.stampBoard();
 }
 Board.prototype.Flip = Board_Flip;
 
@@ -1069,27 +938,6 @@ function EndgameTable(posx, posy, tabheight, lang, position) {
 	var d = this.GetDivElement();
 	document.getElementsByTagName("body")[0].appendChild(d);
 	this.SetHeaderTable(lang);
-
-    /**
-     * Gamecrafsters added variable
-     * @var coloring enables or disables all the features that we have added, ie the coloring and arrows of squares.
-     * @var winLose an array that stores the win in blank moves for the endgame table itself. Stores it by row.
-     * @var sqVVH an array that stores movelists corersponding to each square of the board. The index of the sqVVH
-     *          returns an array of all moves from that square in terms of winTxts. Eg, sqVVH[7] returns the possible
-     *          moves from 7 to other squares. If it does not have any moves, it will return void.
-     * @var minWin stores the four best winning moves. Used for delta remotenss. Stores the winTxts.
-     * @var maxLose stores the four best losing moves. Used for delta remoteness. Stores the winTxts
-     *
-     * @var winTxt common abstraction for Win/Lose/Draw in blank moves. It is an array in the form:
-     *          [,Win/Lose/, in, move number, square it is moving to]. If it is a draw, then
-     *          [,Draw,square it is moving to]. See the abstraction variables of winTxts at the bottoms of the document
-     *          for the abstraction constants. 
-     */
-    this.coloring = true;
-    this.winLose = new Array(); //Stores the win lose draw value for each row in the endgame table.
-    this.sqVVH = new Array(64);  //Stores all winTxt for said square.
-    this.minWin = new Array(4);
-    this.maxLose = new Array(4);
 }
 
 function EndgameTable_GetDivElement() {
@@ -1141,27 +989,13 @@ function EndgameTable_SetObserver(board) {
 EndgameTable.prototype.SetObserver = EndgameTable_SetObserver;
 
 function EndgameTable_SetData(moves) {
-    this.eraseArrows();
-    this.observer.UnmarkAll();
-    this.sqVVH = new Array(64);
-
 	if (moves.length == 0 && this.posval.length == 0) {
 		this.ShowNoInfoAvailable();
-        this.eraseArrows();
 		return;
 	}
-
 		
 	var txt = '<table border="0" cellpadding="0" cellspacing="0">';
-    var minWinPos = 0;
-    var maxLosePos = 0;
-    this.minWin = new Array(4);
-    this.maxLose = new Array(4);
-    var oldWin = -1;
-    var oldLose = -1;
 	for (var k = 0; k < moves.length; k++) {
-        
-
 		var lengths = new Array(60,100);
 		var thestyle = 'style="font-family:Verdana,Geneva,Arial,Helvetica,sans-serif; font-size:11px;font-weight:100;"';
 		txt += '<tr id="'+this.tableid+'_'+k+'" onmousedown="javascript:EndgameTable.Endingdown(event,this);" onmouseover="javascript:EndgameTable.Endingover(event,this);" onmouseout="javascript:EndgameTable.Endingout(event,this);" >';		
@@ -1169,38 +1003,9 @@ function EndgameTable_SetData(moves) {
 		var toks = moves[k][0].split('-');
 		
 		var p = this.position.b[toks[0]];
-		var f = eval(toks[0]);//from square
-		var t = eval(toks[1]);//to square
-		var pi = this.position.piececodes[p];//which piece
-
-        var winTxt = moves[k][1].split(" ");
-
-
-        if(this.coloring){
-
-            if(winTxt[POSRESULT] === "Win" && minWinPos < 4 && oldWin != winTxt[INMOVES]) {
-                this.minWin[minWinPos] = winTxt[INMOVES];
-                minWinPos++;
-                oldWin = winTxt[INMOVES];
-            }
-
-            if(winTxt[POSRESULT] === "Lose" && maxLosePos < 4 && oldLose != winTxt[INMOVES]){
-                this.maxLose[maxLosePos] = winTxt[INMOVES];
-                maxLosePos++;
-                oldLose = winTxt[INMOVES];
-            }
-            
-            if(this.sqVVH[f] == undefined){
-                this.sqVVH[f] = new Array();
-                winTxt.push(t);
-                this.sqVVH[f].push(winTxt);
-                this.observer.ColorSquare(f, winTxt, this.minWin, 
-                       this.maxLose);
-            } else {
-                winTxt.push(t);
-                this.sqVVH[f].push(winTxt);
-            }
-        }
+		var f = eval(toks[0]);
+		var t = eval(toks[1]);
+		var pi = this.position.piececodes[p];
 		
 		var isep = (p == 6 || p == 12) && ((f&7) != (t&7)) && (this.position.b[t] == 0); 
 		var iscapture = (this.position.b[t] != 0) || isep;
@@ -1214,7 +1019,6 @@ function EndgameTable_SetData(moves) {
 			txt += '<td width="'+lengths[i]+'" '+thestyle+'>'+moves[k][i]+'</td>';
 		}
 		txt += '</tr>';
-
 	}
 	txt += '</table>';
 	document.getElementById(this.tableid+'_body').innerHTML = txt;
@@ -1222,7 +1026,6 @@ function EndgameTable_SetData(moves) {
 		document.getElementById(this.tableid+'_value').innerHTML = this.posval[0];
 	else if (this.posval.length == 2 && !this.position.wtm) 
 		document.getElementById(this.tableid+'_value').innerHTML = this.posval[1];
-    this.drawAllArrows();
 }
 
 EndgameTable.prototype.SetData = EndgameTable_SetData;
@@ -1231,9 +1034,6 @@ function EndgameTable_RequestData(pos) {
 	document.getElementById(this.tableid+'_body').innerHTML = "";
 	document.getElementById(this.tableid+'_value').innerHTML = "";
 	var n = pos.NumberOfPieces();
-    //Resetting all my previous stuff
-    this.sqVVH = new Array(64);
-    this.eraseArrows();
 	var valid = pos.IsValid(true);
 	if (!valid) {
 		pos.wtm ^= true;
@@ -1263,10 +1063,7 @@ function EndgameTable_RequestData(pos) {
 			this.cacheresults[0] = null;
 		}
 	}
-	else {
-        this.ShowNoInfoAvailable();
-        this.observer.UnmarkAll();
-    }
+	else this.ShowNoInfoAvailable();
 }
 
 EndgameTable.prototype.RequestData = EndgameTable_RequestData;
@@ -1290,7 +1087,6 @@ function EndgameTable_ParseRequestResult(req,text) {
 	this.movefrom = new Array();
 	this.moveto = new Array();
 	this.movepromo = new Array();
-    this.winLose = new Array();
 	var num = 0;
 	this.posval = new Array('','');
 	if (text) {
@@ -1329,13 +1125,6 @@ function EndgameTable_ParseRequestResult(req,text) {
 
 	
 			this.movefrom[num] = eval(m[0]);	this.moveto[num] = eval(m[1]);	this.movepromo[num] = m.length == 3 ? eval(m[2]) : 0;
-
-            //Added
-            this.winLose[num] = curr[1].split(" ");
-            
-            //End of Added code
-
-
 			if (this.movepromo[num] != 0 && this.moveto[num] >= 56 && this.movepromo[num] > 6) this.movepromo[num]-=6;
 			moves[num] = curr; num++;
 		}
@@ -1349,24 +1138,10 @@ EndgameTable.prototype.ParseRequestResult = EndgameTable_ParseRequestResult;
 function EndgameTable_Endingover(ev, ob) {
 	ob.style.background = '#A0B9E5';
 	var tab = Objectmap.Get(ob.id.split('_')[0]);
-	if (tab.observer != null && tab.observer.liftedpiece == 0) {	
-        var row = ob.id.split('_')[1];
-        var board = tab.observer;
-
-        board.MarkSquare(tab.movefrom[row]); // May change this
-
-        board.MarkSquare(tab.moveto[row], tab.winLose[row], tab.coloring, tab.minWin, tab.maxLose); // Colors square based on winLoseDraw value
-    
-        // Uncolors all existing squares with default VVH colors
-        if(tab.coloring){
-            tab.eraseArrows();
-            for(var i = 0; i < tab.sqVVH.length; i++){
-                if(tab.sqVVH[i] != undefined && i != tab.movefrom[row]){
-                    board.UnmarkSquare(i);
-                }
-            }
-        }
-
+	if (tab.observer != null) {	
+		var row = ob.id.split('_')[1];
+		tab.observer.MarkSquare(tab.movefrom[row]); 
+		tab.observer.MarkSquare(tab.moveto[row]);
 	}
 }
 
@@ -1375,28 +1150,10 @@ EndgameTable.Endingover = EndgameTable_Endingover;
 function EndgameTable_Endingout(ev, ob) {
 	ob.style.background = 'rgb(255,255,255)';
 	var tab = Objectmap.Get(ob.id.split('_')[0]);
-	if (tab.observer != null && tab.observer.liftedpiece == 0 ) {	
+	if (tab.observer != null) {	
 		var row = ob.id.split('_')[1];
-
-        // Unmarks square with piece to default VVH color
-        if(tab.coloring == false){
-            tab.observer.UnmarkSquare(tab.movefrom[row]);
-        } else {
-            tab.observer.UnmarkSquare(tab.movefrom[row], tab.sqVVH[tab.movefrom[row]][0], tab.coloring, tab.minWin, tab.maxLose); 
-        }
-
+		tab.observer.UnmarkSquare(tab.movefrom[row]);
 		tab.observer.UnmarkSquare(tab.moveto[row]);
-
-        //Recolor all other squares
-        if(tab.coloring){
-            for(var i = 0; i < tab.sqVVH.length; i++){
-                if(tab.sqVVH[i] != undefined){
-                    tab.observer.ColorSquare(i, tab.sqVVH[i][0], tab.minWin, tab.maxLose);
-                }
-            }
-            tab.drawAllArrows();
-        }
-
 	}
 }
 
@@ -1414,9 +1171,6 @@ function EndgameTable_Endingdown(ev, ob) {
 EndgameTable.Endingdown = EndgameTable_Endingdown;
 
 function EndgameTable_PositionChanged(pos) {
-    this.observer.UnmarkAll();
-    this.sqVVH = new Array(64);
-    this.eraseArrows();
 	this.RequestData(pos);
 }
 
@@ -1558,13 +1312,13 @@ function SetupTable_GetDivElement() {
 		var to = r * this.sqsize;
 		var col = ((r % 2) == (f % 2)) ? this.darkcolor : this.lightcolor;
 		var sqid = this.tableid+"_"+i;
-		result += "<div id=\""+sqid+"\" style=\"position:absolute;left:"+le+";top:"+to+";background-color:"+col+";\" onmousedown=\"SetupTable.Mousedown(event,this);\" ><img src=\""+piecegraphics[i]+"\" style = \"width: " + sqsize + "px\" ></div>\n";	
+		result += "<div id=\""+sqid+"\" style=\"position:absolute;left:"+le+";top:"+to+";background-color:"+col+";\" onmousedown=\"SetupTable.Mousedown(event,this);\" ><img src=\""+piecegraphics[i]+"\" ></div>\n";	
 	}
 
-	result += "<div id=\""+this.tableid+"_move\" style=\"position:absolute;left:"+(6*this.sqsize)+";top:0;background-color:"+this.darkcolor+"\" onmousedown=\"SetupTable.Mousedown(event,this);\" ><img src=\""+movegraphics+"\" style = \"width: " + sqsize + "px\"></div>\n";	
-	result += "<div id=\""+this.tableid+"_0\" style=\"position:absolute;left:"+(6*this.sqsize)+";top:"+this.sqsize+";background-color:"+this.lightcolor+"\" onmousedown=\"SetupTable.Mousedown(event,this);\" ><img src=\""+piecegraphics[0]+"\" style = \"width: " + sqsize + "px\" ></div>\n";	
+	result += "<div id=\""+this.tableid+"_move\" style=\"position:absolute;left:"+(6*this.sqsize)+";top:0;background-color:"+this.darkcolor+"\" onmousedown=\"SetupTable.Mousedown(event,this);\" ><img src=\""+movegraphics+"\" ></div>\n";	
+	result += "<div id=\""+this.tableid+"_0\" style=\"position:absolute;left:"+(6*this.sqsize)+";top:"+this.sqsize+";background-color:"+this.lightcolor+"\" onmousedown=\"SetupTable.Mousedown(event,this);\" ><img src=\""+piecegraphics[0]+"\" ></div>\n";	
 
-	result += "<div id=\""+this.tableid+"_empty\" style=\"position:absolute;left:"+(7*this.sqsize+this.sqsize/4)+";top:0;\" onmousedown=\"SetupTable.Mousedown(event,this);\" ><img src=\""+emptyboardgraphics+"\" style = \"width: " + sqsize + "px\" ></div>\n";	
+	result += "<div id=\""+this.tableid+"_empty\" style=\"position:absolute;left:"+(7*this.sqsize+this.sqsize/4)+";top:0;\" onmousedown=\"SetupTable.Mousedown(event,this);\" ><img src=\""+emptyboardgraphics+"\" ></div>\n";	
 
 
 
@@ -1615,7 +1369,6 @@ function SetupTable_UnmarkSquare(sq) {
 			sq = 'move'; col = this.darkcolor;
 	 	}
 		document.getElementById(this.tableid+"_"+sq).style.background = col;
-
 }
 
 SetupTable.prototype.UnmarkSquare = SetupTable_UnmarkSquare;
@@ -1852,23 +1605,6 @@ function MG_IAS(p, s, W) {
 		}
 		
 	}
-
-    Board.prototype.setEndgameTable = function(et) {
-                                        this.endgametable = et;
-    }
-
-    function addIndexStuff(){
-        document.write('<canvas id="canvas" width="1000" height="1000"  style = "position: absolute; top: 10; left: 0; z-index: 5; pointer-events: none"></canvas>;');
-        document.write('<div class="info" style="position:absolute; left:0; top:730;" >FEN:</div>');
-        document.write('<div id="info" class="info" onmouseover="enmouse(true);" onmouseout="enmouse(false);" style="position:absolute; left:30; top:730;" ></input></div>');
-
-        document.write('<div class="button" style="position:absolute; left:800; top:558;" onmouseover="over(this);" onmouseout="leave(this);" onclick="flip();" >Flip Board</div>');
-
-        document.write('<div class="button" style="position:absolute; left:800; top:585;" onmouseover="over(this);" onmouseout="leave(this);" onclick="inputfen();" >Input FEN</div>');
-
-        document.write('<div class="button" style="position:absolute; left:800; top:612;" onmouseover="over(this);" onmouseout="leave(this);" onclick="takeback();" >Back</div>');
-    }
-
 	
 	function buildIt() {
 		bwtm = new GuiRadio('<span style="font-family:verdana,arial,helvetica,sans-serif;font-size:11px;font-weight:bold;">'+'White to move'+'</span>',_t);
@@ -1883,28 +1619,26 @@ function MG_IAS(p, s, W) {
 		b.allowfreemoving = true;
 		p.AddListener(b);
 		b.SetRefPosition(p);
-		et = new EndgameTable(sqsize * 10, 3 * sqsize / 4, 358,"en",p);
-        b.setEndgameTable(et);
+		et = new EndgameTable(400,60,279,"en",p);
 		p.AddListener(et);
 		et.SetVisible(true);
 		et.SetObserver(b);
 		em = new EndgameManager();
 		p.AddListener(em);
 
-		st = new SetupTable(0,sqsize * 9.5,'de',p);
+		st = new SetupTable(0,389,'de',p);
 		st.SetVisible(true);
 		st.inputboard = b;
 		b.setuptable = st;
 		p.Clear();
 		
-        
 		bwtm.AddListener(em);
 		bbtm.AddListener(em);
 
 		
 		var d = document.createElement("div");
 		d.style.position = 'absolute';
-		d.style.left = sqsize * 10;
+		d.style.left = 400;
 		d.style.top = 10;
 		d.style.height = 30;
 		d.style.width = 250;
@@ -1912,7 +1646,8 @@ function MG_IAS(p, s, W) {
 	
 		
 		document.getElementsByTagName("body")[0].appendChild(d);
-    }
+
+	}
 
 	
 	function flip() {
@@ -1991,461 +1726,25 @@ function EndgameManager_StateChanged(o) {
 
 EndgameManager.prototype.StateChanged = EndgameManager_StateChanged;
 
-function takeback() {
-    if (em.history.length > 0) {
-        m = em.history.pop();
-        if (em.history.length > 0) {
-            m = em.history.pop();
-        }
-        p.SetFEN(m);
-    }
-}
-
-/**
- * Colors certain square based on input values.
- * @param sq the square to be colored.
- *        winTxt an array of the move, which determines the color.
- *        minWin an array of the 4 best win in blank moves. Contain ints of the win values.
- *        maxLose an array of the 4 best lose in blank moves. Contain ints of the lose values.
- */
-function Board_ColorSquare(sq,winTxt, minWin, maxLose){
-    document.getElementById(this.boardid+"_"+sq).style.background = getColor(winTxt,minWin,maxLose);
-}
-
-Board.prototype.ColorSquare = Board_ColorSquare;
-
-//Color constants that are missing opacities.
-var RED = 'rgba(139,0,0,',
-    YELLOW = 'rgb(255,255,0)',
-    GREEN = 'rgba(0,127,0,',
-    RGB = 'rgb(';
-
-/**
- * The following are abstractions for win text. 
- * winTxt is an array of winlosedraw in blank moves.
- * It stored in the following format:
- *      [ ,Win or Lose or Draw as a string, "in", the number of moves, to square as the square id number]
- *      It doesnt have in number of moves if POSRESULT is a draw.
- */
-var INMOVES = 3,
-    POSRESULT = 1,
-    TO = 4,
-    TODRAW = 2;
-
-/**
- * Returns the color for a certain move. 
- * @param winTxt the winTxt array for certain move.
- *        minWin the array of the 4 best moves.
- *        maxLose the arrow of the 4 best losing moves.
- * @return returns the rgba value for said move.
- *
- * THIS IS NOT THE GC STANDARD COLORING SYSTEM. LOOKS BETTER ON BLUE/WHITE BOARD,
- * BUT NOT ON THE GRAY BOARD
- */
-/*
-function getColor(winTxt, minWin, maxLose){
-    var winLoseDraw = winTxt[POSRESULT],
-        i;
-    if(winLoseDraw == "Win"){
-        for(i = 0; i < 4; i++){
-            if(winTxt[INMOVES] == minWin[i]){
-                return GREEN + getOpacity(i, "Win");
-            }
-        }
-        return GREEN + getOpacity(3);
-    } 
-    else if(winLoseDraw == "Draw"){
-        return YELLOW;
-    }
-    else {
-        for(i = 0; i < 4; i++){
-            if(winTxt[INMOVES] == maxLose[i]) {
-                return RED +  getOpacity(i, "Lose");
-            }
-        }
-        return RED +  getOpacity(3, "Lose");
-    }
-}
-*/
-
-/**
- * Returns the color for a certain move. 
- * @param winTxt the winTxt array for certain move.
- *        minWin the array of the 4 best moves.
- *        maxLose the arrow of the 4 best losing moves.
- * @return returns the rgba value for said move.Gamescrafters standard colors;
- *
- * LOOKS BETTER ON GRAYSCALE BOARD
- */
-function getColor(winTxt, minWin, maxLose){
-    var winLose = winTxt[POSRESULT];
-    if(winLose == "Win"){
-        if(minWin[0] == winTxt[INMOVES]){
-            return RGB + "0,127,0)";
-        } else if (minWin[1] == winTxt[INMOVES]){
-            return RGB + "63,127,63)"; 
-        } else if (minWin[2] == winTxt[INMOVES]){
-            return RGB + "95,127,95)";
-        } else {
-            return RGB + "114,127,114)";
-        }
-    } else if (winLose == "Draw") {
-        return YELLOW;
-    } else {
-        if(winTxt[INMOVES] == maxLose[0]){
-            return RGB + "139,0,0)";
-        } else if (winTxt[INMOVES] == maxLose[1]){
-            return RGB + '133,63,63)';
-        } else if (winTxt[INMOVES] == maxLose[2]) {
-            return RGB +  '130,95,95)';
-        } else {
-            return RGB + '128,114,114)';
-        }
-    }
-}
-
-/**
- * Returns the opacity and finishes the rgba text value.
- *
- * @param i is the rank of the opacity from 0 - 3. The lower the value, 
- *           the less transparent the value will be.
- * @return the opacity value and and parens. Eg, .5)
- * 
- * THIS LOOKS BETTER ON BLUE?HITE BOARD, but not on the gamescrafter standardized coloring system.
- */
-/*
-function getOpacity(i){
-    var txt;
-    if(i == 0){
-        txt = 1;
-    } else if(i == 1) {
-        txt =  .5;
-    } else if(i == 2) {
-        txt = .25;
-    }  else { 
-        txt = .1;
-    }
-    txt += ')' ;
-    return txt;
-}
-*/
-
-/*
- * Function iterates through the move list for the current square. If the 
- * nextSq is in the currentSquares move list, it marks that square.
- *
- * @param currSq the square whose move list you are investigating.
- *        nextSquare the square which you are seeing if it is in the moveList;
- */
-function Board_IterThroughSqVVH(currSq, nextSq){
-    var moveList = this.endgametable.sqVVH[currSq];
-    if(moveList == undefined){
-        return;
-    }
-    for(var i = 0; i < moveList.length; i++){
-        var winTxt = moveList[i];
-        if(winTxt[winTxt.length - 1] == nextSq){
-            this.MarkSquare(nextSq, winTxt, this.endgametable.coloring,
-                    this.endgametable.minWin, this.endgametable.maxLose);
-        }
-    }
-}
-
-Board.prototype.IterThroughSqVVH = Board_IterThroughSqVVH;
-
-/**
- * takes in a square id that is from 0 - 63 and returns the x,y coords
- * of said square. The top corner, or square 56, is [0,0], and the bottom right 
- * corner is 7,7
- * Returns an array of [x,y]
- */
-function Board_getCoordsOf(squareid){
-    if(this.whiteonbottom){
-        var row = 7 - (squareid / 8 >> 0);
-        var col = squareid % 8;
-        return [col, row];
-    } else { //If flipped
-        var row = (squareid / 8 >> 0);
-        var col = 7 - (squareid % 8);
-        return [col, row];
-    }
-
-}
-
-Board.prototype.getCoordsOf = Board_getCoordsOf;
-
-/**
- * Function to determine direction from one square to another.
- * @params from the starting square. to is the ending square.
- * @return string of the direction 'from' from to 'to'
- * The string is either up, down, left right, or a combo of {up, down} + {left, right}
- */
-function Board_getDirection(from, to){
-    var fromCoord = this.getCoordsOf(from);
-    var toCoord = this.getCoordsOf(to);
-    if(fromCoord[0] == toCoord[0]){
-        if(fromCoord[1] > toCoord[1]){
-            return "up";
-        } else { 
-            return "down";
-        }
-    } else if (fromCoord[1] == toCoord[1]){
-        if(fromCoord[0] > toCoord[0]){
-            return "left";
-        } else {
-            return "right";
-        }
-    } else if(fromCoord[0] > toCoord[0]){
-        if(fromCoord[1] > toCoord[1]){
-            return "upleft";
-        } else{
-            return "downleft";
-        }
-    } else if(fromCoord[0] < toCoord[0]){
-        if(fromCoord[1] > toCoord[1]){
-            return "upright";
-        } else{
-            return "downright";
-        }
-    }
-}
-
-Board.prototype.getDirection = Board_getDirection;
+	function takeback() {
+		if (em.history.length > 0) {
+			m = em.history.pop();
+			if (em.history.length > 0) {
+				m = em.history.pop();
+			}
+			p.SetFEN(m);
+		}
+	}
 
 
-/**
- * Returns the coordinates of the topleft of the desired square
- * @param square the square whose topleft corner you want.
- * @return an array of the coordinates (x,y) of the top left corner of input
- */
-function Board_getTopLeft(square){
-    var coords = this.getCoordsOf(square);
-    var x = coords[0] * (sqsize + 1);
-    var y = coords[1] * (sqsize + 1);
-    return [x,y];
-}
-
-Board.prototype.getTopLeft = Board_getTopLeft;
-
-/**
- * Helper function for arrow. 
- * Given the certain direction string from the set {up, down, left, right, upleft, upright, downleft, downright},
- * Returns the offset of that string in an array of [x,y], in which x is the offset for x coord and y is the offset in y coord.
- *
- * The offset represents the following chart:
- * | DL  L   UL|
- * |           |
- * | D        U|
- * |           |
- * |_DR__R___UR|
- *
- */
-function offSetArrow(string){
-    var div = 6;
-    var x, y;
-    if(string == "up"){
-        x = (div - 1) * (sqsize / div);
-        y = sqsize / 2; 
-    } else if (string == "down"){
-        x = sqsize / div;
-        y = sqsize / 2; 
-    } else if(string == "left"){
-        x = sqsize / 2;
-        y = sqsize / div; 
-    } else if(string == "right"){
-        x = sqsize / 2;
-        y = (div - 1) * sqsize / div; 
-    } else if (string == "upright"){
-        x = (div - 2) * sqsize / div;
-        y = (div - 2) * sqsize / div;
-    } else if (string == "upleft"){
-        x = (div - 2) * sqsize / div;
-        y = sqsize / div;
-    } else if (string == "downleft"){
-        x = sqsize / div;
-        y = 2 * sqsize / div;
-    } else if(string == "downright"){
-        x = sqsize / div;
-        y = (div - 1) * sqsize / div;
-    }
-    return [x,y];
-}
 
 
-//Draws an arrow from start to end of specficied color
-function EndgameTable_drawArrow(start, end, color){
-    var board = this.observer;
-    var st = board.getTopLeft(start);
-    var e = board.getTopLeft(end);
-    var direction = board.getDirection(start, end);
-    var offset = offSetArrow(direction);
 
-    st[0] += offset[0];
-    e[0] += offset[0];
-    st[1] += offset[1];
-    e[1] += offset[1];
-    var ctx = document.getElementById("canvas").getContext('2d');
-    canvas_arrow(ctx, st[0], st[1], e[0], e[1], color);
-}
 
-EndgameTable.prototype.drawArrow = EndgameTable_drawArrow;
 
-//Arrow drawer function. Takes in a canvas context and coordinates and color to draw specified arrow.
-function canvas_arrow(context, fromx, fromy, tox, toy, color){
-    var headlen = 10;   // length of head in pixels
-    var angle = Math.atan2(toy-fromy,tox-fromx);
-    context.beginPath();
-    context.moveTo(fromx, fromy);
-    context.lineTo(tox, toy);
-    context.moveTo(tox, toy);
-    //context.arc(tox, toy, 3, 0, 2 * Math.PI, false);
-    //context.fillStyle = color;
-    //context.fill();
-    context.lineTo(tox-headlen*Math.cos(angle-Math.PI/6),toy-headlen*Math.sin(angle-Math.PI/6));
-    context.moveTo(tox, toy);
-    context.lineTo(tox-headlen*Math.cos(angle+Math.PI/6),toy-headlen*Math.sin(angle+Math.PI/6));
-    context.lineWidth = 8;
-    context.strokeStyle = color;
-    context.lineCap = 'round';
-    context.stroke();
-}
 
-/**
- * Function that determines the previous square in the direction from start to end.
- * Takes in a starting and ending square, in terms of square id, 
- * Returns the square id of the previous square that is traveled when going from start to end.
- */
-function Board_prevSquare(start, end){
-    var to = this.getCoordsOf(end);
-    var string = this.getDirection(start, end);
-    var x, y;
-    if(string == "up"){
-        x = 0;
-        y = 1; 
-    } else if (string == "down"){
-        x = 0;
-        y = -1; 
-    } else if(string == "left"){
-        x = 1;
-        y = 0; 
-    } else if(string == "right"){
-        x = -1;
-        y = 0; 
-    } else if (string == "upright"){
-        x = -1;
-        y = 1;
-    } else if (string == "upleft"){
-        x = 1;
-        y = 1;
-    } else if (string == "downleft"){
-        x = 1;
-        y = -1;
-    } else if(string == "downright"){
-        x = -1;
-        y = -1; 
-    }
-    //Returns the square id of prev square
-    if(this.whiteonbottom){ 
-        return (7-(to[1] + y)) * 8 + (to[0] + x);
-    } else {
-        var yWeight = (to[1] + y) * 8;
-        var xWeight = -(to[0] + x) +  7;
-        return yWeight + xWeight;
-    }
-}
 
-Board.prototype.prevSquare = Board_prevSquare;
 
-/**
- * Draws all arrows onto the canvas based on the current sqVVH values.
- * Algorithim: Draws arrow based on induction. If a piece can move to a certain square,
- * it can move to the previous square in that direction if it isnt a knight.
- * If it can move to that square, it can move that squares previous, and so on and so forth.
- * As a result, in the for loop, it only draws arrows one square long. 
- * 
- *
- * FIXME Mabye
- * As of now, it is slow because it has to check if that piece can move there. 
- * We forgot about the scenario when a piece is in check. Then it can only move to certain squares,
- * and not ones before it.
- * However, it still runs almost instanteously;
- */
-function EndgameTable_drawAllArrows(){
-    var board = this.observer,
-        i = 0,
-        j = 0,
-        k,
-        color,
-        hasPrev,
-        pic,
-        previd;
-    if(this.coloring === false){
-        return;
-    }
-    for(i = 0; i < this.sqVVH.length; i++){
-        if(this.sqVVH[i] != undefined){
-            var moves = this.sqVVH[i];
-            for(j = 0; j < moves.length; j++){
-                hasPrev = false;
-                color = getColor(moves[j], this.minWin, this.maxLose);
-                prevId = board.prevSquare(i, moves[j][moves[j].length - 1]);
-                for(k = 0; k < moves.length; k++){ //Very Slow. Change this later. Checks if prevsquare exists.`
-                    if(prevId == moves[k][moves[k].length - 1]){
-                        hasPrev = true;
-                        break;
-                    }
-                }
-                if(board.currentpieces[i] == 5 || this.observer.currentpieces[i] == 11 || !hasPrev){ //If knight or in check
-                    this.drawArrow(i, moves[j][moves[j].length - 1], color);
-                } else {
-                    this.drawArrow(prevId, moves[j][moves[j].length - 1], color);
-                }
-            }
-        }
-    }
-    //this.stampBoard();
-}
 
-EndgameTable.prototype.drawAllArrows = EndgameTable_drawAllArrows;
 
-/*
- * Erases all arrows.
- * Does this by completely resetting the canvas. 
- */
-EndgameTable.prototype.eraseArrows = function() {
-    var canvas = document.getElementById("canvas");
-    var ctx = canvas.getContext('2d');
-    ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.restore();
-};
 
-EndgameTable.prototype.stampBoard = function() {
-    var canvas = document.getElementById("picvas"),
-        ctx = canvas.getContext('2d'),
-        board = this.observer,
-        i = 0,
-        coords,
-        img,
-        pos;
-
-    for(i = 0; i < board.currentpieces.length; i++){
-        if(board.currentpieces[i]){
-            img = new Image();
-            img.src = piecegraphics[board.currentpieces[i]];
-            coords = board.getCoordsOf(i);
-            pos = board.getTopLeft(i);
-            ctx.drawImage(img, pos[0] - coords[0] , pos[1] - coords[1], sqsize, sqsize);
-        }
-    }
-}
-
-EndgameTable.prototype.unStampBoard = function() {
-    var canvas = document.getElementById("picvas");
-    var ctx = canvas.getContext('2d');
-    ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.restore();
-}
